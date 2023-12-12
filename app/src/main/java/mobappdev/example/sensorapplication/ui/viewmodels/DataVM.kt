@@ -31,6 +31,9 @@ class DataVM @Inject constructor(
 
     private val gyroDataFlow = internalSensorController.currentGyroUI
     private val hrDataFlow = polarController.currentHR
+    val xAngleFlow = internalSensorController.xAngle
+    val yAngleFlow = internalSensorController.yAngle
+    val zAngleFlow = internalSensorController.zAngle
 
     // Combine the two data flows
     val combinedDataFlow= combine(

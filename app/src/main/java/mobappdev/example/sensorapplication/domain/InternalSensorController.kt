@@ -15,7 +15,9 @@ interface InternalSensorController {
     val currentGyroUI: StateFlow<Triple<Float, Float, Float>?>
     val streamingGyro: StateFlow<Boolean>
     val streamingLinAcc: StateFlow<Boolean>
-
+    val xAngle:StateFlow<Double>
+    val yAngle:StateFlow<Double>
+    val zAngle:StateFlow<Double>
     fun startImuStream()
     fun stopImuStream()
 

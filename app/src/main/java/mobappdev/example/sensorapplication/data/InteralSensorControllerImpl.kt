@@ -24,6 +24,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mobappdev.example.sensorapplication.domain.InternalSensorController
+import java.util.Vector
+import kotlin.math.atan
+import kotlin.math.atan2
+import kotlin.math.sqrt
 
 private const val LOG_TAG = "Internal Sensor Controller"
 
@@ -50,6 +54,22 @@ class InternalSensorControllerImpl(
     private val _streamingLinAcc = MutableStateFlow(false)
     override val streamingLinAcc: StateFlow<Boolean>
         get() = _streamingLinAcc.asStateFlow()
+
+    private val _xAngle = MutableStateFlow(0.0)
+    override val xAngle: StateFlow<Double>
+        get() = _xAngle.asStateFlow()
+
+    private val _yAngle = MutableStateFlow(0.0)
+    override val yAngle: StateFlow<Double>
+        get() = _yAngle.asStateFlow()
+    private val _zAngle = MutableStateFlow(0.0)
+    override val zAngle: StateFlow<Double>
+        get() = _zAngle.asStateFlow()
+
+
+    private var _xPrevAngle = 0.0
+    private var _yPrevAngle = 0.0
+    private var _zPrevAngle = 0.0
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val gyroSensor: Sensor? by lazy {
@@ -101,11 +121,43 @@ class InternalSensorControllerImpl(
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_GYROSCOPE) {
             // Extract gyro data (angular speed around X, Y, and Z axes
+            val v = Triple(event.values[0], event.values[1], event.values[2])
             _currentGyro = Triple(event.values[0], event.values[1], event.values[2])
+            val xAngleRaw = atan2(v.second, v.third) * (180 / Math.PI)
+            val yAngleRaw = atan2(v.first, v.third) * (180 / Math.PI)
+            val zAngleRaw = atan2(sqrt(v.first * v.first + v.second * v.second), v.third) * (180 / Math.PI)
+            _xAngle.value = filterEWMA(xAngleRaw,_xPrevAngle)
+            _yAngle.value = filterEWMA(yAngleRaw,_yPrevAngle)
+            Log.d("X_ANGLE","X-Angle=${_xAngle.value}")
+            Log.d("Y_ANGLE","Y-Angle=${_yAngle.value}")
         }
+    }
+
+    private fun calculateAngle(v:Triple<Float, Float, Float>):Double{
+        val refVector = Triple(1.0,0.0,0.0)
+
+        val dotProduct = v.first * refVector.first + v.second * refVector.second + v.third * refVector.third
+        val magnitudeRef =  sqrt(refVector.first*refVector.first + refVector.second * refVector.second + refVector.third * refVector.third)
+        val magnitudeVector = sqrt(v.first*v.first + v.second * v.second + v.third * v.third)
+
+        val cosTheta = dotProduct / (magnitudeRef * magnitudeVector)
+        val safeCosTheta = if (cosTheta > 1.0) 1.0 else if (cosTheta < -1.0) -1.0 else cosTheta
+
+        return atan(safeCosTheta)
+    }
+
+
+
+
+
+    private fun filterEWMA(value:Double,prevValue:Double):Double{
+        val a = 0.5
+        return a * value + (1 - a) * prevValue
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
         // Not used in this example
     }
+
+
 }

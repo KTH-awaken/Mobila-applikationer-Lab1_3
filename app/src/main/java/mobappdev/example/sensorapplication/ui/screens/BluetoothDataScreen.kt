@@ -54,6 +54,7 @@ fun BluetoothDataScreen(
         is CombinedSensorData.HrData -> combinedSensorData.hr.toString()
         else -> "-"
     }
+    val xAngle: String
 
     Column(
         modifier = Modifier
