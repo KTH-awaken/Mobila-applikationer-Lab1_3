@@ -95,6 +95,12 @@ class DataVM @Inject constructor(
         _state.update { it.copy(measuring = true) }
     }
 
+    fun startLinearAcc() {
+//        internalSensorController.startLinearAccStream()
+//        streamType = StreamType.LOCAL_ACC
+//
+//        _state.update { it.copy(measuring = true) }
+    }
     fun stopDataStream(){
         when (streamType) {
             StreamType.LOCAL_GYRO -> internalSensorController.stopGyroStream()

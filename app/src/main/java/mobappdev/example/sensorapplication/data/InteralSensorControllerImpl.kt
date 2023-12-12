@@ -128,8 +128,8 @@ class InternalSensorControllerImpl(
             val zAngleRaw = atan2(sqrt(v.first * v.first + v.second * v.second), v.third) * (180 / Math.PI)
             _xAngle.value = filterEWMA(xAngleRaw,_xPrevAngle)
             _yAngle.value = filterEWMA(yAngleRaw,_yPrevAngle)
-            Log.d("X_ANGLE","X-Angle=${_xAngle.value}")
-            Log.d("Y_ANGLE","Y-Angle=${_yAngle.value}")
+            _zAngle.value = filterEWMA(zAngleRaw,_zPrevAngle)
+            Log.d("ANGLE","X:${_xAngle.value.toInt()}"+" Y:${_yAngle.value.toInt()}"+" Z:${_zAngle.value.toInt()}")
         }
     }
 
