@@ -41,6 +41,7 @@ class InternalSensorControllerImpl(
         get() = _currentLinAccUI.asStateFlow()
 
     private var _currentGyro: Triple<Float, Float, Float>? = null
+    private var _currentLinAcc: Triple<Float, Float, Float>? = null
 
     // Expose gyro to the UI on a certain interval
     private val _currentGyroUI = MutableStateFlow<Triple<Float, Float, Float>?>(null)
@@ -75,13 +76,40 @@ class InternalSensorControllerImpl(
     private val gyroSensor: Sensor? by lazy {
         sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
     }
+    private val linAccSensor: Sensor? by lazy {
+        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    }
 
     override fun startImuStream() {
-        // Todo: implement
+        if (linAccSensor == null) {
+            Log.e(LOG_TAG, "LinAcc sensor is not available on this device")
+            return
+        }
+        if (_streamingLinAcc.value) {
+            Log.e(LOG_TAG, "LinAcc sensor is already streaming")
+            return
+        }
+
+        // Register this class as a listener for gyroscope events
+        sensorManager.registerListener(this, linAccSensor, SensorManager.SENSOR_DELAY_UI)
+
+        // Start a coroutine to update the UI variable on a 2 Hz interval
+        GlobalScope.launch(Dispatchers.Main) {
+            _streamingLinAcc.value = true
+            while (_streamingLinAcc.value) {
+                // Update the UI variable
+                _currentLinAccUI.update { _currentLinAcc }
+                delay(500)
+            }
+        }
     }
 
     override fun stopImuStream() {
-        // Todo: implement
+        if (_streamingLinAcc.value) {
+            // Unregister the listener to stop receiving gyroscope events (automatically stops the coroutine as well
+            sensorManager.unregisterListener(this, linAccSensor)
+            _streamingLinAcc.value = false
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -122,15 +150,28 @@ class InternalSensorControllerImpl(
         if (event.sensor.type == Sensor.TYPE_GYROSCOPE) {
             // Extract gyro data (angular speed around X, Y, and Z axes
             val v = Triple(event.values[0], event.values[1], event.values[2])
-            _currentGyro = Triple(event.values[0], event.values[1], event.values[2])
-            val xAngleRaw = atan2(v.second, v.third) * (180 / Math.PI)
-            val yAngleRaw = atan2(v.first, v.third) * (180 / Math.PI)
-            val zAngleRaw = atan2(sqrt(v.first * v.first + v.second * v.second), v.third) * (180 / Math.PI)
-            _xAngle.value = filterEWMA(xAngleRaw,_xPrevAngle)
-            _yAngle.value = filterEWMA(yAngleRaw,_yPrevAngle)
-            Log.d("X_ANGLE","X-Angle=${_xAngle.value}")
-            Log.d("Y_ANGLE","Y-Angle=${_yAngle.value}")
+            _currentGyro = calculateAngles(v)
+
+        }else if(event.sensor.type == Sensor.TYPE_ACCELEROMETER){
+            val v = Triple(event.values[0], event.values[1], event.values[2])
+            _currentLinAcc = calculateAngles(v)
         }
+    }
+
+    private fun calculateAngles(v:Triple<Float,Float,Float>):Triple<Float,Float,Float>{
+        val xAngleRaw = atan2(v.second, v.third) * (360 / Math.PI)
+        val yAngleRaw = atan2(v.first, v.third) * (360 / Math.PI)
+        val zAngleRaw = atan2(sqrt(v.first * v.first + v.second * v.second), v.third) * (180 / Math.PI)
+
+        val xAngle = filterEWMA(xAngleRaw,_xPrevAngle)
+        val yAngle = filterEWMA(yAngleRaw,_yPrevAngle)
+        val zAngle = filterEWMA(zAngleRaw,_zPrevAngle)
+
+        Log.d("X_ANGLE","X-Angle=${xAngle}")
+        Log.d("Y_ANGLE","Y-Angle=${yAngle}")
+        Log.d("Z_ANGLE","Z-Angle=${zAngle}")
+
+        return Triple(xAngle.toFloat(), yAngle.toFloat(), zAngle.toFloat())
     }
 
     private fun calculateAngle(v:Triple<Float, Float, Float>):Double{
