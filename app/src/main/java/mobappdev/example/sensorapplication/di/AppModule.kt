@@ -10,8 +10,6 @@ package mobappdev.example.sensorapplication.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
