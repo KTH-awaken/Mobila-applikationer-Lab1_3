@@ -44,9 +44,12 @@ class DataVM @Inject constructor(
     fun setSensorType(sensorType:String){
         _sensorType.value=sensorType
     }
+    private val _maximumMeasurementTime = MutableStateFlow(30)
+    val maximumMeasurementTime: StateFlow<Int> get() = _maximumMeasurementTime
 
 
-
+//    private val _savedData = MutableStateFlow<List<Measurment>>(emptyList())
+//    val savedData: StateFlow<List<Day>> get() = _savedData
     // Combine the two data flows
     val combinedDataFlow= combine(
         gyroDataFlow,

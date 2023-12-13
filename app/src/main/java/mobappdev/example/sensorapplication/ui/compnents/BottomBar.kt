@@ -38,7 +38,7 @@ fun BottomBar(
     navController: NavHostController,
 ) {
     val screens = listOf(
-        Destinations.HomeScreen, Destinations.Search,Destinations.Devices,
+        Destinations.HomeScreen, Destinations.Saved,Destinations.Devices,
     )
     Column(
         modifier = Modifier
