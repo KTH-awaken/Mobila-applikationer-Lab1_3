@@ -24,7 +24,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import mobappdev.example.sensorapplication.ui.Destinations
+import mobappdev.example.sensorapplication.ui.theme.Styles.blackBg
+import mobappdev.example.sensorapplication.ui.theme.Styles.blackText
 import mobappdev.example.sensorapplication.ui.theme.Styles.componentWidth
+import mobappdev.example.sensorapplication.ui.theme.Styles.lightGray
+import mobappdev.example.sensorapplication.ui.theme.Styles.yellowAppleWatch
 
 //import com.example.mobila_applikationer_lab12.ui.Destinations
 //import com.example.mobila_applikationer_lab12.ui.theme.Styles.componentWidth
@@ -34,26 +38,25 @@ fun BottomBar(
     navController: NavHostController,
 ) {
     val screens = listOf(
-        Destinations.HomeScreen, Destinations.Search,Destinations.Favourite,
+        Destinations.HomeScreen, Destinations.Search,Destinations.Devices,
     )
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(33, 36, 74))
-        ,
+            .background(blackBg),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         NavigationBar(
             modifier = Modifier
-                .size(width =componentWidth, height = 80.dp).clip(shape = RoundedCornerShape(10.dp)).background(Color.Red)
+                .size(width =componentWidth, height = 80.dp).clip(shape = RoundedCornerShape(10.dp)).background(
+                    blackBg)
                 .background(
-                    color = Color(54, 59, 100),
+                    color = blackBg,
                     shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                 )
-                .width(componentWidth)
-            ,
-            containerColor = Color(54, 59, 100),
+                .width(componentWidth),
+            containerColor = blackBg,
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
@@ -68,7 +71,7 @@ fun BottomBar(
                         Icon(
                             imageVector = screen.icon!!,
                             contentDescription = "",
-                            tint = if (currentRoute == screen.route) Color.Black else Color.LightGray
+                            tint = if (currentRoute == screen.route) blackText else lightGray
                         )
                     },
                     selected = currentRoute == screen.route,
@@ -82,7 +85,7 @@ fun BottomBar(
                         }
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        unselectedTextColor = Color.LightGray, selectedTextColor = Color.White
+                        unselectedTextColor = lightGray, selectedTextColor = Color.White
                     ),
                 )
             }

@@ -33,6 +33,15 @@ class DataVM @Inject constructor(
     private val hrDataFlow = polarController.currentHR
     private val linAccDataFlow = internalSensorController.currentLinAccUI
 
+    private var _sensorMode = MutableStateFlow<String>("LinAcc")
+    val sensorMode: StateFlow<String> get() = _sensorMode
+
+    private var _sensorType = MutableStateFlow<String>("Internal")
+    val sensorType: StateFlow<String> get() = _sensorType
+
+
+
+
     // Combine the two data flows
     val combinedDataFlow= combine(
         gyroDataFlow,

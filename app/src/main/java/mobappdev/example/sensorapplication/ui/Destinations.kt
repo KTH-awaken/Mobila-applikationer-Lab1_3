@@ -1,8 +1,11 @@
 package mobappdev.example.sensorapplication.ui
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -13,7 +16,7 @@ sealed class Destinations(
 ) {
     object HomeScreen : Destinations(
         route = "home",
-        title = "Home",
+        title = "Record",
         icon = Icons.Outlined.Home
     )
 
@@ -23,10 +26,10 @@ sealed class Destinations(
         icon = Icons.Outlined.Search
     )
 
-    object Favourite : Destinations(
-        route = "favourite",
-        title = "Favorite",
-        icon = Icons.Outlined.Star
+    object Devices : Destinations(
+        route = "devices",
+        title = "Devices",
+        icon = Icons.Outlined.Settings
     )
 
 

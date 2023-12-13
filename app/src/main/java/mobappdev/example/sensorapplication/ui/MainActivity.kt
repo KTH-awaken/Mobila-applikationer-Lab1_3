@@ -10,8 +10,12 @@ package mobappdev.example.sensorapplication.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -63,7 +67,7 @@ class MainActivity : ComponentActivity() {
             SensorapplicationTheme {
                 val navController = rememberNavController()
                 val vm = hiltViewModel<DataVM>()
-
+                hideSystemBars()
                 // Use hardcoded deviceID
                 vm.chooseSensor(deviceId)
 
@@ -82,9 +86,6 @@ class MainActivity : ComponentActivity() {
                             NavigationGraph(navController = navController, vm = vm )
                         }
                     }
-
-
-
                 }
             }
         }
@@ -100,9 +101,29 @@ class MainActivity : ComponentActivity() {
             composable(Destinations.Search.route) {
                     BluetoothDataScreen(vm = vm)
             }
-            composable(Destinations.Favourite.route) {
+            composable(Destinations.Devices.route) {
 //                Favorites(vm=vm)
             }
+        }
+    }
+}
+
+fun ComponentActivity.hideSystemBars() {
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+    window.decorView.systemUiVisibility = (
+            View.SYSTEM_UI_FLAG_IMMERSIVE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LOW_PROFILE
+            )
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        window.insetsController?.let {
+            it.hide(WindowInsets.Type.statusBars())
+            it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 }
