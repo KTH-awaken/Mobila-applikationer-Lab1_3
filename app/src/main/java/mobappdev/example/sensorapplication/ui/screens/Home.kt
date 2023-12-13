@@ -12,22 +12,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import mobappdev.example.sensorapplication.ui.compnents.ActionButtons
 import mobappdev.example.sensorapplication.ui.compnents.Angle
+import mobappdev.example.sensorapplication.ui.compnents.SelectorButtons
 import mobappdev.example.sensorapplication.ui.theme.Styles.blackBg
 import mobappdev.example.sensorapplication.ui.viewmodels.DataVM
 
 @Composable
-//column fun called home with no parameters
+
 fun Home(
     vm:DataVM
 ) {
-    Column( // Container
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(blackBg),
         horizontalAlignment = Alignment.CenterHorizontally,
         ){
+            SelectorButtons(vm = vm)
             Angle(vm = vm)
-
             ActionButtons(vm = vm)
 
     }
