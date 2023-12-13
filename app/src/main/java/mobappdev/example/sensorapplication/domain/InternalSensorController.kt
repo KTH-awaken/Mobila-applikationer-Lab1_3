@@ -9,15 +9,18 @@ package mobappdev.example.sensorapplication.domain
  */
 
 import kotlinx.coroutines.flow.StateFlow
+import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
+import mobappdev.example.sensorapplication.data.model.Measurement
 
 interface InternalSensorController {
     val currentLinAccUI: StateFlow<Triple<Float, Float, Float>?>
     val currentGyroUI: StateFlow<Triple<Float, Float, Float>?>
     val streamingGyro: StateFlow<Boolean>
     val streamingLinAcc: StateFlow<Boolean>
-    val xAngle:StateFlow<Double>
-    val yAngle:StateFlow<Double>
-    val zAngle:StateFlow<Double>
+
+    val measurementsUI:StateFlow<List<Measurement>?>
+
+
     fun startImuStream()
     fun stopImuStream()
 

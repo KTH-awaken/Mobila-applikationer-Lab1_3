@@ -23,8 +23,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
+import mobappdev.example.sensorapplication.data.model.Measurement
+import mobappdev.example.sensorapplication.data.model.addMeasurement
 import mobappdev.example.sensorapplication.domain.InternalSensorController
-import java.util.Vector
+import java.util.Collections.addAll
+import java.util.Date
 import kotlin.math.atan
 import kotlin.math.atan2
 import kotlin.math.sqrt
@@ -32,7 +36,8 @@ import kotlin.math.sqrt
 private const val LOG_TAG = "Internal Sensor Controller"
 
 class InternalSensorControllerImpl(
-    context: Context
+    context: Context,
+    val measurementsRepo: MeasurementsRepo
 ): InternalSensorController, SensorEventListener {
 
     // Expose acceleration to the UI
@@ -56,16 +61,12 @@ class InternalSensorControllerImpl(
     override val streamingLinAcc: StateFlow<Boolean>
         get() = _streamingLinAcc.asStateFlow()
 
-    private val _xAngle = MutableStateFlow(0.0)
-    override val xAngle: StateFlow<Double>
-        get() = _xAngle.asStateFlow()
+    private val _measurementsUI = MutableStateFlow<List<Measurement>>(emptyList())
+    override val measurementsUI: StateFlow<List<Measurement>?>
+        get() = _measurementsUI.asStateFlow()
 
-    private val _yAngle = MutableStateFlow(0.0)
-    override val yAngle: StateFlow<Double>
-        get() = _yAngle.asStateFlow()
-    private val _zAngle = MutableStateFlow(0.0)
-    override val zAngle: StateFlow<Double>
-        get() = _zAngle.asStateFlow()
+    private var _currentMeasurements = MutableStateFlow<List<Measurement>>(emptyList())
+
 
 
     private var _xPrevAngle = 0.0
@@ -98,16 +99,29 @@ class InternalSensorControllerImpl(
             _streamingLinAcc.value = true
             while (_streamingLinAcc.value) {
                 // Update the UI variable
+                measurementsRepo.listOfMeasurementsFlow.collect { listOfMeasurements ->
+                    Log.d("COLLECTING","Size of listOfMeasurements: ${listOfMeasurements.size}")
+                    Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
+                }
+                _currentMeasurements.addMeasurement(_currentLinAcc)
+                Log.d("MEASUREMENT", "Size=${_currentMeasurements.value.size}")
+                Log.d("MEASUREMENT", "Measurement=${_currentMeasurements.value.last()}")
+
+                _measurementsUI.update { _currentMeasurements.value }
                 _currentLinAccUI.update { _currentLinAcc }
                 delay(500)
             }
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun stopImuStream() {
         if (_streamingLinAcc.value) {
-            // Unregister the listener to stop receiving gyroscope events (automatically stops the coroutine as well
             sensorManager.unregisterListener(this, linAccSensor)
+            GlobalScope.launch {
+                measurementsRepo.saveMeasurementsToList(_currentMeasurements.value)
+                _currentMeasurements.value = emptyList()
+            }
             _streamingLinAcc.value = false
         }
     }
@@ -132,6 +146,7 @@ class InternalSensorControllerImpl(
             while (_streamingGyro.value) {
                 // Update the UI variable
                 _currentGyroUI.update { _currentGyro }
+
                 delay(500)
             }
         }
@@ -167,9 +182,9 @@ class InternalSensorControllerImpl(
         val yAngle = filterEWMA(yAngleRaw,_yPrevAngle)
         val zAngle = filterEWMA(zAngleRaw,_zPrevAngle)
 
-        Log.d("X_ANGLE","X-Angle=${xAngle}")
-        Log.d("Y_ANGLE","Y-Angle=${yAngle}")
-        Log.d("Z_ANGLE","Z-Angle=${zAngle}")
+        //Log.d("X_ANGLE","X-Angle=${xAngle}")
+        //Log.d("Y_ANGLE","Y-Angle=${yAngle}")
+        //Log.d("Z_ANGLE","Z-Angle=${zAngle}")
 
         return Triple(xAngle.toFloat(), yAngle.toFloat(), zAngle.toFloat())
     }
