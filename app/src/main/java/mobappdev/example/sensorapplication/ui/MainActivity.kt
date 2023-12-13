@@ -42,6 +42,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import mobappdev.example.sensorapplication.ui.compnents.BottomBar
 import mobappdev.example.sensorapplication.ui.screens.Home
+import mobappdev.example.sensorapplication.ui.screens.Saved
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -98,10 +99,11 @@ class MainActivity : ComponentActivity() {
             composable(Destinations.HomeScreen.route) {
                 Home(vm = vm)
             }
-            composable(Destinations.Search.route) {
-                    BluetoothDataScreen(vm = vm)
+            composable(Destinations.Saved.route) {
+                Saved(vm = vm)
             }
             composable(Destinations.Devices.route) {
+                    BluetoothDataScreen(vm = vm)
 //                Favorites(vm=vm)
             }
         }

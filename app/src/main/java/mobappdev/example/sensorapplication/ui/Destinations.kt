@@ -20,9 +20,9 @@ sealed class Destinations(
         icon = Icons.Outlined.Home
     )
 
-    object Search : Destinations(
-        route = "search",
-        title = "Location",
+    object Saved : Destinations(
+        route = "saved",
+        title = "Saved",
         icon = Icons.Outlined.Search
     )
 
