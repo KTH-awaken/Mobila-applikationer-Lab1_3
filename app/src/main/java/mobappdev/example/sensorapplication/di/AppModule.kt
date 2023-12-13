@@ -9,6 +9,9 @@ package mobappdev.example.sensorapplication.di
  */
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,9 +19,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mobappdev.example.sensorapplication.data.AndroidPolarController
 import mobappdev.example.sensorapplication.data.InternalSensorControllerImpl
+import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
 import mobappdev.example.sensorapplication.domain.InternalSensorController
 import mobappdev.example.sensorapplication.domain.PolarController
 import javax.inject.Singleton
+
+
 
 
 @Module
@@ -32,7 +38,18 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideInternalSensorController(@ApplicationContext context: Context): InternalSensorController {
-        return InternalSensorControllerImpl(context)
+    fun provideInternalSensorController(@ApplicationContext context: Context,measurementsRepo:MeasurementsRepo): InternalSensorController {
+        return InternalSensorControllerImpl(context, measurementsRepo)
+    }
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("YourPreferencesName", Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMeasurementsRepo(dataStore: SharedPreferences): MeasurementsRepo {
+        return MeasurementsRepo(dataStore)
     }
 }

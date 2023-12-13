@@ -9,6 +9,7 @@ package mobappdev.example.sensorapplication.domain
  */
 
 import kotlinx.coroutines.flow.StateFlow
+import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
 import mobappdev.example.sensorapplication.data.model.Measurement
 
 interface InternalSensorController {
@@ -18,6 +19,7 @@ interface InternalSensorController {
     val streamingLinAcc: StateFlow<Boolean>
 
     val measurementsUI:StateFlow<List<Measurement>?>
+
 
     fun startImuStream()
     fun stopImuStream()

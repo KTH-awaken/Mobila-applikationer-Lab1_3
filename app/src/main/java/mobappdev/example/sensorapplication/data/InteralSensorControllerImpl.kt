@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
 import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.data.model.addMeasurement
 import mobappdev.example.sensorapplication.domain.InternalSensorController
@@ -35,7 +36,8 @@ import kotlin.math.sqrt
 private const val LOG_TAG = "Internal Sensor Controller"
 
 class InternalSensorControllerImpl(
-    context: Context
+    context: Context,
+    val measurementsRepo: MeasurementsRepo
 ): InternalSensorController, SensorEventListener {
 
     // Expose acceleration to the UI
@@ -97,7 +99,10 @@ class InternalSensorControllerImpl(
             _streamingLinAcc.value = true
             while (_streamingLinAcc.value) {
                 // Update the UI variable
-
+                measurementsRepo.listOfMeasurementsFlow.collect { listOfMeasurements ->
+                    Log.d("COLLECTING","Size of listOfMeasurements: ${listOfMeasurements.size}")
+                    Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
+                }
                 _currentMeasurements.addMeasurement(_currentLinAcc)
                 Log.d("MEASUREMENT", "Size=${_currentMeasurements.value.size}")
                 Log.d("MEASUREMENT", "Measurement=${_currentMeasurements.value.last()}")
@@ -109,11 +114,14 @@ class InternalSensorControllerImpl(
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun stopImuStream() {
         if (_streamingLinAcc.value) {
-            // Unregister the listener to stop receiving gyroscope events (automatically stops the coroutine as well
             sensorManager.unregisterListener(this, linAccSensor)
-            _currentMeasurements.value = emptyList()
+            GlobalScope.launch {
+                measurementsRepo.saveMeasurementsToList(_currentMeasurements.value)
+                _currentMeasurements.value = emptyList()
+            }
             _streamingLinAcc.value = false
         }
     }

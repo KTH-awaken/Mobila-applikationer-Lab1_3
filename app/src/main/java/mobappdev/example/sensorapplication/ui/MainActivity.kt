@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 import mobappdev.example.sensorapplication.ui.screens.BluetoothDataScreen
 import mobappdev.example.sensorapplication.ui.theme.SensorapplicationTheme
 import mobappdev.example.sensorapplication.ui.viewmodels.DataVM
