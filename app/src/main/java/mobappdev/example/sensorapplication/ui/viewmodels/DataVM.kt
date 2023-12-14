@@ -40,8 +40,8 @@ class DataVM @Inject constructor(
     private val linAccDataFlow = internalSensorController.currentLinAccUI
     private val _savedData = internalSensorController.measurementsUI
 
-    private val polarGyroDataFlow = polarController.currentGyroUI
-    private val polarAccDataFlow = polarController.currentLinAccUI
+    val polarGyroDataFlow = polarController.currentGyroUI
+     val polarAccDataFlow = polarController.currentLinAccUI
 
     private val hrDataFlow = polarController.currentHR
     val savedData: StateFlow<List<List<Measurement>>> get() = _savedData
@@ -79,11 +79,14 @@ class DataVM @Inject constructor(
     val combinedDataFlow= combine(
         if(_isPolarStreaming.value){
             Log.d("POLAR_STREAM","isPolarStreaming=${_isPolarStreaming.value}")
-            polarGyroDataFlow} else {gyroDataFlow},
+            polarGyroDataFlow
+        } else {gyroDataFlow},
         hrDataFlow,
+
         if(_isPolarStreaming.value){
             Log.d("POLAR_STREAM","isPolarStreaming=${_isPolarStreaming.value}")
-            polarAccDataFlow} else {linAccDataFlow}
+            polarAccDataFlow
+        } else {linAccDataFlow}
     ) { gyro, hr,linAcc ->
         if (hr != null ) {
             CombinedSensorData.HrData(hr)
@@ -235,6 +238,7 @@ class DataVM @Inject constructor(
         streamType = StreamType.EXTERNAL_GYRO
         polarController.startGyroStream(deviceId.value)
 
+        Log.d("POLARGYRO", polarController.currentGyroUI.value.toString())
         _state.update { it.copy(measuring = true) }
     }
 
@@ -271,7 +275,6 @@ sealed class CombinedSensorData {
     data class LinAccData(val linAcc: Triple<Float, Float, Float>?): CombinedSensorData()
     data class HrData(val hr: Int?) : CombinedSensorData()
     data class LinAccAndGyroData(val linAcc: Triple<Float, Float, Float>?,val gyro: Triple<Float, Float, Float>?)
-
 
 }
 

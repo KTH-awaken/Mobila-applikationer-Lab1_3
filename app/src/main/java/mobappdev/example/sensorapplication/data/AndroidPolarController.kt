@@ -187,7 +187,7 @@ class AndroidPolarController (
                         )
                     }
                 } }
-                Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")
+                Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")//TODO HÄR HAR VI VÄRDET
 
                 delay(500)
             }
