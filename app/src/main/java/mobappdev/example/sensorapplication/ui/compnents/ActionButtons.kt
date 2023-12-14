@@ -35,7 +35,7 @@ fun ActionButtons(
         ){
                 Button(
                     colors = ButtonDefaults.buttonColors(yellowAppleWatch),
-                    onClick = vm::startLinAcc,
+                    onClick ={} //todo vm::startLinAcc,
 //                    enabled = (!state.measuring)
                 ) {
                     Text(text = "Start Acc", color = blackText)
