@@ -2,25 +2,30 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permissions needed for API 31 and up (S)    -->
+    <!-- Permissions needed for API 31 and up (S)    Jitse-->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-<!--    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"-->
-<!--        android:usesPermissionFlags="neverForLocation"-->
-<!--        tools:targetApi="s" />-->
-
-<!--    EXTRA BLUTHOOTH PERMISSIONS-->
-<!--    <uses-permission android:name="android.permission.BLUETOOTH"/>-->
-<!--    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>-->
-<!--    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>-->
-<!--    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
-
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"         tools:targetApi="s" />
     <!-- Permissions needed for API 30 and down (R)   -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="30"/>
+
+<!--    &lt;!&ndash; Permissions needed for API 31 and up (S)    &ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />-->
+<!--&lt;!&ndash;    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:usesPermissionFlags="neverForLocation"&ndash;&gt;-->
+<!--&lt;!&ndash;        tools:targetApi="s" />&ndash;&gt;-->
+
+
+<!--    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />-->
+
+<!--    &lt;!&ndash; Permissions needed for API 30 and down (R)   &ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />-->
+<!--    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>-->
+<!--    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30"/>-->
+<!--    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="30"/>-->
 
 
     <uses-feature android:name="android.hardware.bluetooth" />
