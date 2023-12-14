@@ -47,8 +47,8 @@ fun Saved(
         LazyColumn(
             modifier = Modifier.padding(8.dp)
         ) {
-            items(savedData.value.size) { index -> // Iterate over the index of savedData list
-                val session = savedData.value[index] // Get the session which is a List<Measurement>
+            items(savedData.value.size) { index ->
+                val session = savedData.value[index]
                 SavedItem(vm = vm,session = session)
             }
         }

@@ -87,6 +87,7 @@ class InternalSensorControllerImpl(
         CSVHelper.exportToCSV(context,measurements)
     }
 
+    //TODO: remove
     override fun startImuStream() {
         if (linAccSensor == null) {
             Log.e(LOG_TAG, "LinAcc sensor is not available on this device")
@@ -122,7 +123,7 @@ class InternalSensorControllerImpl(
             }
         }
     }
-
+    //TODO: remove
     @OptIn(DelicateCoroutinesApi::class)
     override fun stopImuStream() {
         if (_streamingLinAcc.value) {

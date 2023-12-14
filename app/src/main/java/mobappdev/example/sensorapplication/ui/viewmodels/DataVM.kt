@@ -38,9 +38,6 @@ class DataVM @Inject constructor(
     private val linAccDataFlow = internalSensorController.currentLinAccUI
     private val _savedData = internalSensorController.measurementsUI
 
-//    private val gyroDataFlow = internalSensorController.currentGyroUI
-//    private val linAccDataFlow = internalSensorController.currentLinAccUI
-//    private val _savedData = internalSensorController.measurementsUI
     private val hrDataFlow = polarController.currentHR
     val savedData: StateFlow<List<List<Measurement>>> get() = _savedData
 

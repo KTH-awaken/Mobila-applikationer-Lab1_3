@@ -11,6 +11,7 @@ object Styles{
     val lightBlueCard = Color(54, 59, 100)
     val lightBlueText = Color(161, 185, 221)
     val yellowAppleWatch = Color(181, 225, 79)
+    val redAppleWatch = Color(180, 46, 102)
     val blackBg = Color(0,0,0)
     val lightGray = Color.LightGray
     val darkGray = Color.DarkGray

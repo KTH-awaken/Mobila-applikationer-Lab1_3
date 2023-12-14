@@ -26,10 +26,9 @@ import mobappdev.example.sensorapplication.ui.viewmodels.DataVM
 fun SelectorButtons(
     vm : DataVM
 ){
-    val sensorMode = vm.sensorMode.collectAsState().value
-    val sensorType = vm.sensorType.collectAsState().value
-    val isToggled = vm.sensorMode.collectAsState().value == "GYRO"
-    val show = true //todo set show till false när messurement är igång
+
+    val isToggled = vm.sensorType.collectAsState().value == "POLAR"
+    val show = vm.state.collectAsState().value.connected
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -39,29 +38,32 @@ fun SelectorButtons(
        Column(
 
        ){
-//            Column (
-//                modifier = Modifier,
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ){
-//                    Text("Gyro", color = yellowAppleWatch)
-//                    Switch(
-//                        checked = isToggled,
-//                        onCheckedChange = { isChecked ->
-//                            vm.setSensorMode(if (isChecked) "GYRO" else "ACC")
-//                        },
-//                        colors = SwitchDefaults.colors(
-//                            checkedThumbColor = blackText,
-//                            uncheckedThumbColor = yellowAppleWatch,
-//                            checkedTrackColor = yellowAppleWatch,
-//                            uncheckedTrackColor = blackText,
-//                            checkedBorderColor = yellowAppleWatch,
-//                            uncheckedBorderColor = yellowAppleWatch
-//
-//                        )
-//                    )
-//                }
 
-            Column {
+           if (show){
+               Column (
+                   modifier = Modifier,
+                   horizontalAlignment = Alignment.CenterHorizontally
+               ){
+                   Text("Polar", color = yellowAppleWatch)
+                   Switch(
+                       checked = isToggled,
+                       onCheckedChange = { isChecked ->
+                           vm.setSensorType(if (isChecked) "POLAR" else "INTERNAL")
+                       },
+                       colors = SwitchDefaults.colors(
+                           checkedThumbColor = blackText,
+                           uncheckedThumbColor = yellowAppleWatch,
+                           checkedTrackColor = yellowAppleWatch,
+                           uncheckedTrackColor = blackText,
+                           checkedBorderColor = yellowAppleWatch,
+                           uncheckedBorderColor = yellowAppleWatch
+
+                       )
+                   )
+               }
+           }
+
+            /*Column {
                 IconButton(
                     onClick = {
                       //TODO DOWNOLOAD AS CSV
@@ -84,7 +86,7 @@ fun SelectorButtons(
                         )
                     }
                 }
-            }
+            }*/
        }
    }
 }

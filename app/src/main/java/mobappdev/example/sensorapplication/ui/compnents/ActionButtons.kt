@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mobappdev.example.sensorapplication.ui.theme.Styles.blackText
+import mobappdev.example.sensorapplication.ui.theme.Styles.redAppleWatch
 import mobappdev.example.sensorapplication.ui.theme.Styles.yellowAppleWatch
 import mobappdev.example.sensorapplication.ui.viewmodels.DataVM
 
@@ -34,37 +35,40 @@ fun ActionButtons(
         ){
                 Button(
                     colors = ButtonDefaults.buttonColors(yellowAppleWatch),
-                    onClick = vm::stopDataStream,
-//                    enabled = (state.measuring)
-                ) {
-                    Text(text = "Stop Acc", color = blackText)
-                }
-                Button(
-                    colors = ButtonDefaults.buttonColors(yellowAppleWatch),
                     onClick = vm::startLinAcc,
 //                    enabled = (!state.measuring)
                 ) {
                     Text(text = "Start Acc", color = blackText)
                 }
+            Button(
+                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
+                onClick = {
+                    //todo check if polar or internal and start and stop acordinly
+                    vm::startGyro
+                },
+//                    enabled = (!state.measuring)
+            ) {
+                Text(text = "Start gyro", color = blackText)
+            }
         }
         Row(
             modifier = Modifier,
             horizontalArrangement = Arrangement.spacedBy(5.dp),
         ){
             Button(
-                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
+                colors = ButtonDefaults.buttonColors(redAppleWatch),
+                onClick = vm::stopDataStream,
+//                    enabled = (state.measuring)
+            ) {
+                Text(text = "Stop Acc", color = blackText)
+            }
+            Button(
+                colors = ButtonDefaults.buttonColors(redAppleWatch),
                 onClick = vm::stopDataStream,
 //                    enabled = (state.measuring)
             ) {
                 Text(text = "Stop gyro", color = blackText)
             }
-            Button(
-                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
-                onClick = vm::startGyro,
-//                    enabled = (!state.measuring)
-            ) {
-                Text(text = "Start gyro", color = blackText)
-        }
         }
     }
 }
