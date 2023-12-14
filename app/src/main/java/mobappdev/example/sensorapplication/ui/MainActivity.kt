@@ -3,10 +3,15 @@ package mobappdev.example.sensorapplication.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -32,16 +37,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.input.key.Key.Companion.Home
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import mobappdev.example.sensorapplication.R
 import mobappdev.example.sensorapplication.ui.compnents.BottomBar
 import mobappdev.example.sensorapplication.ui.screens.Home
 import mobappdev.example.sensorapplication.ui.screens.Saved
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(), PermissionRequester {
+    companion object {
+        private const val CHANNEL_ID = "background_service_channel"
+    }
+
     // Todo: Change for your own deviceID
 //    private var deviceId = "B37EA42F" //defult
 //    private var deviceId = "C07C8F22" //INTE ALEX sesor
@@ -55,6 +66,9 @@ class MainActivity : ComponentActivity(), PermissionRequester {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestRequiredPermissions()
+
+        createNotificationChannel()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT), 31)
@@ -80,7 +94,7 @@ class MainActivity : ComponentActivity(), PermissionRequester {
                 ) {
                     Scaffold(
                         modifier = Modifier.fillMaxWidth(),
-                          bottomBar = { BottomBar(navController = navController, ) }
+                          bottomBar = { BottomBar(navController = navController) }
                     ) {paddingValues ->
                         Box(
                             modifier =Modifier.padding(paddingValues)
@@ -92,6 +106,45 @@ class MainActivity : ComponentActivity(), PermissionRequester {
             }
         }
     }
+
+    override fun onStop() {
+        super.onStop()
+        if (vm.maximumMeasurementTime.value==43200000) {
+            Log.d("BLUETOOTH", "onStop")
+            showBackgroundRunningNotification()
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val serviceChannel = NotificationChannel(
+                CHANNEL_ID,
+                "Background Service Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(serviceChannel)
+        }
+    }
+    private fun showBackgroundRunningNotification() {
+            Log.d("BLUETOOTH", "showBackgroundRunningNotification")
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Background Task")
+            .setContentText("The task is running in the background.")
+            .setSmallIcon(R.drawable.outline_file_download_24) // Replace with your icon
+            .setContentIntent(pendingIntent)
+            .build()
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(1, notification) // 1 is the notification ID
+    }
+
 
     private fun requestRequiredPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

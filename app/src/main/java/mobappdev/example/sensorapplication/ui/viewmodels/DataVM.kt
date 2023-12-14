@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import mobappdev.example.sensorapplication.data.model.CSVHelper
 import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.domain.InternalSensorController
@@ -52,9 +54,12 @@ class DataVM @Inject constructor(
     fun setSensorType(sensorType:String){
         _sensorType.value=sensorType
     }
-    private val _maximumMeasurementTime = MutableStateFlow(30)
+    private val _maximumMeasurementTime = MutableStateFlow(10000)
     val maximumMeasurementTime: StateFlow<Int> get() = _maximumMeasurementTime
-
+    fun setMaximumMesurmentTime(time:Int){
+        Log.d("BLUETOOTH", "SET MAX TIME "+time)
+        _maximumMeasurementTime.value=time
+    }
     var permissionRequester: PermissionRequester? = null
 //    private val _savedData = MutableStateFlow<List<Measurement>>(emptyList())
 //    val savedData: StateFlow<List<Measurement>> get() = _savedData
@@ -195,9 +200,19 @@ class DataVM @Inject constructor(
         streamType = StreamType.LOCAL_GYRO
 
         _state.update { it.copy(measuring = true) }
+
+        viewModelScope.launch {
+            val maxTime = maximumMeasurementTime.value
+            delay(maxTime.toLong()) // 10 seconds in milliseconds
+//            stopDataStream()
+            internalSensorController.stopGyroStream()
+            Log.d("BLUETOOTH", "STOPPED STREAMING TIMER DONE")
+
+        }
+
     }
 
-    fun startLinAcc() {
+    fun startLinAcc() {//todo remove not used
         internalSensorController.startImuStream()
         streamType = StreamType.LOCAL_ACC
 

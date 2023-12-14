@@ -28,6 +28,7 @@ fun SelectorButtons(
 ){
 
     val isToggled = vm.sensorType.collectAsState().value == "POLAR"
+    val isToggledDay = vm.maximumMeasurementTime.collectAsState().value == 43200000
     val show = vm.state.collectAsState().value.connected
     Row(
         modifier = Modifier
@@ -49,6 +50,29 @@ fun SelectorButtons(
                        checked = isToggled,
                        onCheckedChange = { isChecked ->
                            vm.setSensorType(if (isChecked) "POLAR" else "INTERNAL")
+                       },
+                       colors = SwitchDefaults.colors(
+                           checkedThumbColor = blackText,
+                           uncheckedThumbColor = yellowAppleWatch,
+                           checkedTrackColor = yellowAppleWatch,
+                           uncheckedTrackColor = blackText,
+                           checkedBorderColor = yellowAppleWatch,
+                           uncheckedBorderColor = yellowAppleWatch
+
+                       )
+                   )
+               }
+           }
+           if (true){
+               Column (
+                   modifier = Modifier,
+                   horizontalAlignment = Alignment.CenterHorizontally
+               ){
+                   Text("Day", color = yellowAppleWatch)
+                   Switch(
+                       checked = isToggledDay,
+                       onCheckedChange = { isChecked ->
+                           vm.setMaximumMesurmentTime(if (isChecked) 43200000 else 10000)
                        },
                        colors = SwitchDefaults.colors(
                            checkedThumbColor = blackText,
