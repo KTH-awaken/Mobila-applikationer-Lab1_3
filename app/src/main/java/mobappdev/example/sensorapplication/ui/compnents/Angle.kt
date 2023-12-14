@@ -22,26 +22,47 @@ fun Angle(
     vm: DataVM
 ) {
     val combinedSensorData = vm.combinedDataFlow.collectAsState().value
-    var angle = 0.0f
+    var linAngle = 0.0f
+    var gyroAngle = 0.0f
 
     if (combinedSensorData is CombinedSensorData.LinAccData){
         combinedSensorData.linAcc?.let {
-            angle = it.first
+            linAngle = it.first
+        }
+    }
+    if (combinedSensorData is CombinedSensorData.GyroData){
+        combinedSensorData.gyro?.let {
+            gyroAngle = it.first
+        }
+    }
+    Row {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(top = 20.dp,bottom = 20.dp, start = 5.dp, end = 5.dp),
+                text = " ${linAngle.toInt()}°",
+                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
+                color = yellowAppleWatch,
+            )
+            Text(text = "Acc", color =yellowAppleWatch)
+        }
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(top = 20.dp,bottom = 20.dp, start = 5.dp, end = 5.dp),
+                text = " ${gyroAngle.toInt()}°",
+                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
+                color = yellowAppleWatch,
+            )
+            Text(text = "Gyro", color =yellowAppleWatch)
         }
     }
 
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(top = 20.dp,bottom = 20.dp),
-            text = " ${angle.toInt()}°",
-            style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
-            color = yellowAppleWatch,
-        )
-
-    }
 }
 

@@ -39,27 +39,27 @@ fun SelectorButtons(
        Column(
 
        ){
-            Column (
-                modifier = Modifier,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                    Text("Gyro", color = yellowAppleWatch)
-                    Switch(
-                        checked = isToggled,
-                        onCheckedChange = { isChecked ->
-                            vm.setSensorMode(if (isChecked) "GYRO" else "ACC")
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = blackText,
-                            uncheckedThumbColor = yellowAppleWatch,
-                            checkedTrackColor = yellowAppleWatch,
-                            uncheckedTrackColor = blackText,
-                            checkedBorderColor = yellowAppleWatch,
-                            uncheckedBorderColor = yellowAppleWatch
-
-                        )
-                    )
-                }
+//            Column (
+//                modifier = Modifier,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ){
+//                    Text("Gyro", color = yellowAppleWatch)
+//                    Switch(
+//                        checked = isToggled,
+//                        onCheckedChange = { isChecked ->
+//                            vm.setSensorMode(if (isChecked) "GYRO" else "ACC")
+//                        },
+//                        colors = SwitchDefaults.colors(
+//                            checkedThumbColor = blackText,
+//                            uncheckedThumbColor = yellowAppleWatch,
+//                            checkedTrackColor = yellowAppleWatch,
+//                            uncheckedTrackColor = blackText,
+//                            checkedBorderColor = yellowAppleWatch,
+//                            uncheckedBorderColor = yellowAppleWatch
+//
+//                        )
+//                    )
+//                }
 
             Column {
                 IconButton(

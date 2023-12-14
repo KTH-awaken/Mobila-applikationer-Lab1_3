@@ -29,28 +29,42 @@ fun ActionButtons(
         verticalArrangement = Arrangement.Bottom,
     ){
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
         ){
-
-            if(state.measuring){
                 Button(
                     colors = ButtonDefaults.buttonColors(yellowAppleWatch),
                     onClick = vm::stopDataStream,
-                    enabled = (state.measuring)
+//                    enabled = (state.measuring)
                 ) {
-                    Text(text = "Stop", color = blackText)
+                    Text(text = "Stop Acc", color = blackText)
                 }
-            }else{
                 Button(
                     colors = ButtonDefaults.buttonColors(yellowAppleWatch),
                     onClick = vm::startLinAcc,
-                    enabled = (!state.measuring)
+//                    enabled = (!state.measuring)
                 ) {
-                    Text(text = "Start", color = blackText)
+                    Text(text = "Start Acc", color = blackText)
                 }
+        }
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+        ){
+            Button(
+                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
+                onClick = vm::stopDataStream,
+//                    enabled = (state.measuring)
+            ) {
+                Text(text = "Stop gyro", color = blackText)
             }
+            Button(
+                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
+                onClick = vm::startGyro,
+//                    enabled = (!state.measuring)
+            ) {
+                Text(text = "Start gyro", color = blackText)
+        }
         }
     }
 }
