@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
@@ -213,5 +214,14 @@ class InternalSensorControllerImpl(
         // Not used in this example
     }
 
+    init{
+        GlobalScope.launch {
+            measurementsRepo.listOfMeasurementsFlow.collect{ it ->
+                Log.d("INIT_COLLECTING","Size of listOfMeasurements: ${it.size}")
+                Log.d("INIT_COLLECTING","listOfMeasurements: $it")
+                _measurementsUI.update { it }
+            }
+        }
+    }
 
 }
