@@ -34,9 +34,13 @@ class DataVM @Inject constructor(
 ): ViewModel() {
 
     private val gyroDataFlow = internalSensorController.currentGyroUI
-    private val hrDataFlow = polarController.currentHR
     private val linAccDataFlow = internalSensorController.currentLinAccUI
     private val _savedData = internalSensorController.measurementsUI
+
+//    private val gyroDataFlow = internalSensorController.currentGyroUI
+//    private val linAccDataFlow = internalSensorController.currentLinAccUI
+//    private val _savedData = internalSensorController.measurementsUI
+    private val hrDataFlow = polarController.currentHR
     val savedData: StateFlow<List<List<Measurement>>> get() = _savedData
 
     private var _sensorMode = MutableStateFlow<String>("ACC")
@@ -168,8 +172,6 @@ class DataVM @Inject constructor(
         // Permission is granted, proceed with the Bluetooth device check
         return device.name?.startsWith("Polar") == true
     }
-
-
 
 
     fun chooseSensor(deviceId: String) {

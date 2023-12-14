@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.update
 import mobappdev.example.sensorapplication.domain.PolarController
 import java.util.UUID
 
-class AndroidPolarController (
+class AndroidPolarControllerCopy (
     private val context: Context,
 ): PolarController {
 
