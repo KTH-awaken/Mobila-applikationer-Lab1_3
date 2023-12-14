@@ -42,10 +42,7 @@ fun ActionButtons(
                 }
             Button(
                 colors = ButtonDefaults.buttonColors(yellowAppleWatch),
-                onClick = {
-                    //todo check if polar or internal and start and stop acordinly
-                    vm::startGyro
-                },
+                onClick = vm::startGyro,
 //                    enabled = (!state.measuring)
             ) {
                 Text(text = "Start gyro", color = blackText)
