@@ -204,6 +204,10 @@ class DataVM @Inject constructor(
         _state.update { it.copy(measuring = true) }
     }
 
+    fun startPolarGyro(){
+        polarController.startGyroStream(deviceId.value)
+    }
+
     fun stopDataStream(){
         when (streamType) {
             StreamType.LOCAL_GYRO -> internalSensorController.stopGyroStream()
