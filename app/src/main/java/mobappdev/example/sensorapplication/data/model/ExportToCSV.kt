@@ -12,12 +12,12 @@ import java.io.FileWriter
 import java.io.IOException
 
 object CSVHelper{
+    private var n = 0
     fun exportToCSV(context: Context, listOfMeasurements: List<Measurement>) {
         if (listOfMeasurements.isNullOrEmpty())
             throw IOException("Measurements is empty or null")
 
-        val fileName = "your_file.csv"
-
+        val fileName = "${n++}_your_file.csv"
         // Permission granted, proceed with file creation
         val externalFilesDir = context.getExternalFilesDir(null)
         val filePath = File(externalFilesDir, fileName)
