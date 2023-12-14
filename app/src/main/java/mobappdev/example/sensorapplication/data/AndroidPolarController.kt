@@ -9,20 +9,27 @@ package mobappdev.example.sensorapplication.data
  * Last modified: 2023-07-11
  */
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiCallback
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.errors.PolarInvalidArgument
+import com.polar.sdk.api.model.PolarAccelerometerData
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData
+import com.polar.sdk.api.model.PolarSensorSetting
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import mobappdev.example.sensorapplication.data.model.MathFilter
 import mobappdev.example.sensorapplication.domain.PolarController
 import java.util.UUID
 
@@ -65,6 +72,30 @@ class AndroidPolarController (
     private val _measuring = MutableStateFlow(false)
     override val measuring: StateFlow<Boolean>
         get() = _measuring.asStateFlow()
+
+
+    private val _currentLinAccUI = MutableStateFlow<Triple<Float, Float, Float>?>(null)
+    override val currentLinAccUI: StateFlow<Triple<Float, Float, Float>?>
+        get() = _currentLinAccUI.asStateFlow()
+
+    private val _currentGyroUI = MutableStateFlow<Triple<Float, Float, Float>?>(null)
+    override val currentGyroUI: StateFlow<Triple<Float, Float, Float>?>
+        get() = _currentGyroUI.asStateFlow()
+
+    private val _streamingGyro = MutableStateFlow(false)
+    override val streamingGyro: StateFlow<Boolean>
+        get() = _streamingGyro.asStateFlow()
+
+    private val _streamingLinAcc = MutableStateFlow(false)
+    override val streamingLinAcc: StateFlow<Boolean>
+        get() = _streamingLinAcc.asStateFlow()
+
+    private lateinit var broadcastDisposable: Disposable
+
+    private var lastLinAccSample: Triple<Float, Float, Float>? = null
+    private var lastGyroSample: Triple<Float, Float, Float>? = null
+
+    private lateinit var mathFilter: MathFilter
 
     init {
         api.setPolarFilter(false)
@@ -114,6 +145,59 @@ class AndroidPolarController (
             Log.e(TAG, "Failed to disconnect from $deviceId.\n Reason $polarInvalidArgument")
         }
     }
+
+    @SuppressLint("CheckResult")
+    override fun startGyroStream(deviceId:String) {
+        requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.GYRO)
+        requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.ACC).flatMap {
+                settings: PolarSensorSetting ->
+            api.startAccStreaming(deviceId, settings)
+        }.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { polarAccelerometerData: PolarAccelerometerData ->
+                    for (data in polarAccelerometerData.samples) {
+                        Log.d(TAG, "ACC    x: ${data.x} y: ${data.y} z: ${data.z} timeStamp: ${data.timeStamp}")
+                    }
+                },
+                { error: Throwable ->
+                    Log.e(TAG, "ACC stream failed. Reason $error")
+                },
+                {
+                    Log.d(TAG, "ACC stream complete")
+                }
+            )
+    }
+    //TODO use this PolarBleApi.PolarDeviceDataType.ACC
+
+    override fun stopGyroStream() {
+        TODO("Not yet implemented")
+    }
+
+    private fun requestStreamSettings(identifier: String, feature: PolarBleApi.PolarDeviceDataType): Flowable<PolarSensorSetting> {
+        return Single.zip(
+            api.requestStreamSettings(identifier, feature),
+            api.requestFullStreamSettings(identifier, feature)
+                .onErrorReturn {
+                    Log.w(TAG, "Full stream settings are not available for feature $feature. REASON: $it")
+                    PolarSensorSetting(emptyMap())
+                },
+            { available: PolarSensorSetting, all: PolarSensorSetting ->
+                if (available.settings.isEmpty()) {
+                    throw Throwable("Settings are not available")
+                } else {
+                    Log.d(TAG, "Feature $feature available settings ${available.settings}")
+                    Log.d(TAG, "Feature $feature all settings ${all.settings}")
+                    return@zip android.util.Pair(available, all)
+                }
+            }
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .toFlowable()
+            .map { sensorSettings: android.util.Pair<PolarSensorSetting, PolarSensorSetting> ->
+                return@map sensorSettings.first
+            }
+    }
+
 
     override fun startHrStreaming(deviceId: String) {
         val isDisposed = hrDisposable?.isDisposed ?: true

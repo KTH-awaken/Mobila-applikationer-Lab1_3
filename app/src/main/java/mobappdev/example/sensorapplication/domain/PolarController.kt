@@ -18,9 +18,17 @@ interface PolarController {
     val connected: StateFlow<Boolean>
     val measuring: StateFlow<Boolean>
 
+    val currentLinAccUI: StateFlow<Triple<Float, Float, Float>?>
+    val currentGyroUI: StateFlow<Triple<Float, Float, Float>?>
+    val streamingGyro: StateFlow<Boolean>
+    val streamingLinAcc: StateFlow<Boolean>
+
     fun connectToDevice(deviceId: String)
     fun disconnectFromDevice(deviceId: String)
 
+
+    fun startGyroStream(deviceId:String)
+    fun stopGyroStream()
     fun startHrStreaming(deviceId: String)
     fun stopHrStreaming()
 }

@@ -65,6 +65,14 @@ class AndroidPolarControllerCopy (
     private val _measuring = MutableStateFlow(false)
     override val measuring: StateFlow<Boolean>
         get() = _measuring.asStateFlow()
+    override val currentLinAccUI: StateFlow<Triple<Float, Float, Float>?>
+        get() = TODO("Not yet implemented")
+    override val currentGyroUI: StateFlow<Triple<Float, Float, Float>?>
+        get() = TODO("Not yet implemented")
+    override val streamingGyro: StateFlow<Boolean>
+        get() = TODO("Not yet implemented")
+    override val streamingLinAcc: StateFlow<Boolean>
+        get() = TODO("Not yet implemented")
 
     init {
         api.setPolarFilter(false)
@@ -113,6 +121,14 @@ class AndroidPolarControllerCopy (
         } catch (polarInvalidArgument: PolarInvalidArgument) {
             Log.e(TAG, "Failed to disconnect from $deviceId.\n Reason $polarInvalidArgument")
         }
+    }
+
+    override fun startGyroStream(deviceId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun stopGyroStream() {
+        TODO("Not yet implemented")
     }
 
     override fun startHrStreaming(deviceId: String) {
