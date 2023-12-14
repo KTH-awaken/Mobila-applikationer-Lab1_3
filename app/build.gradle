@@ -49,9 +49,12 @@ android {
 }
 
 dependencies {
+
+    //CSV
+    implementation 'org.apache.commons:commons-csv:1.5'
+
     // premison for for compse
 //    implementation "com.google.accompanist:accompanist-permissions:<latest_version>"
-
 
     //Data
     implementation "androidx.datastore:datastore-preferences:1.0.0-beta01" //uppdatera inte

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import mobappdev.example.sensorapplication.data.model.CSVHelper
 import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.domain.InternalSensorController
 import mobappdev.example.sensorapplication.domain.PolarController
@@ -75,11 +76,9 @@ class DataVM @Inject constructor(
     ) { gyro, hr,linAcc ->
         if (hr != null ) {
             CombinedSensorData.HrData(hr)
-        } else if (gyro != null) {
-            CombinedSensorData.GyroData(gyro)
-        }else if (linAcc != null){
-            CombinedSensorData.LinAccData(linAcc)
-        } else {
+        } else if (gyro != null && linAcc != null) {
+            CombinedSensorData.LinAccAndGyroData(linAcc,gyro)
+        }else {
             null
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
@@ -217,6 +216,9 @@ class DataVM @Inject constructor(
         }
         _state.update { it.copy(measuring = false) }
     }
+    fun exportMeasurements(measurements:List<Measurement>){
+        internalSensorController.exportMeasurements(measurements = measurements)
+    }
 }
 
 data class DataUiState(
@@ -233,5 +235,8 @@ sealed class CombinedSensorData {
     data class GyroData(val gyro: Triple<Float, Float, Float>?) : CombinedSensorData()
     data class LinAccData(val linAcc: Triple<Float, Float, Float>?): CombinedSensorData()
     data class HrData(val hr: Int?) : CombinedSensorData()
+    data class LinAccAndGyroData(val linAcc: Triple<Float, Float, Float>?,val gyro: Triple<Float, Float, Float>?)
+
+
 }
 

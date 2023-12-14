@@ -21,9 +21,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
+import mobappdev.example.sensorapplication.data.model.CSVHelper
 import mobappdev.example.sensorapplication.data.model.MathFilter
 import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.data.model.addMeasurement
@@ -37,7 +39,7 @@ import kotlin.math.sqrt
 private const val LOG_TAG = "Internal Sensor Controller"
 
 class InternalSensorControllerImpl(
-    context: Context,
+    private val context: Context,
     val measurementsRepo: MeasurementsRepo
 ): InternalSensorController, SensorEventListener {
 
@@ -81,6 +83,9 @@ class InternalSensorControllerImpl(
 
     private lateinit var mathFilter: MathFilter
 
+    override fun exportMeasurements(measurements: List<Measurement>) {
+        CSVHelper.exportToCSV(context,measurements)
+    }
 
     override fun startImuStream() {
         if (linAccSensor == null) {
@@ -156,9 +161,9 @@ class InternalSensorControllerImpl(
                     Log.d("COLLECTING","Size of listOfMeasurements: ${listOfMeasurements.size}")
                     Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
                 }
+
                 _currentMeasurements.addMeasurement(_currentLinAcc)
                 Log.d("MEASUREMENT", "Size=${_currentMeasurements.value.size}")
-                Log.d("MEASUREMENT", "Measurement=${_currentMeasurements.value.last()}")
 
                 _measurementsUI.update { listOfMeasurements }
                 _currentLinAccUI.update { _currentLinAcc }
@@ -175,7 +180,12 @@ class InternalSensorControllerImpl(
             // Unregister the listener to stop receiving gyroscope events (automatically stops the coroutine as well
             sensorManager.unregisterListener(this, gyroSensor)
             sensorManager.unregisterListener(this, linAccSensor)
+            GlobalScope.launch {
+                measurementsRepo.saveMeasurementsToList(_currentMeasurements.value)
+                _currentMeasurements.value = emptyList()
+            }
             _streamingGyro.value = false
+            _streamingLinAcc.value = false
         }
     }
 
@@ -204,5 +214,14 @@ class InternalSensorControllerImpl(
         // Not used in this example
     }
 
+    init{
+        GlobalScope.launch {
+            measurementsRepo.listOfMeasurementsFlow.collect{ it ->
+                Log.d("INIT_COLLECTING","Size of listOfMeasurements: ${it.size}")
+                Log.d("INIT_COLLECTING","listOfMeasurements: $it")
+                _measurementsUI.update { it }
+            }
+        }
+    }
 
 }

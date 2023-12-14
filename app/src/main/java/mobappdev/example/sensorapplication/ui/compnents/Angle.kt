@@ -25,14 +25,12 @@ fun Angle(
     var linAngle = 0.0f
     var gyroAngle = 0.0f
 
-    if (combinedSensorData is CombinedSensorData.LinAccData){
-        combinedSensorData.linAcc?.let {
-            linAngle = it.first
+    if (combinedSensorData is CombinedSensorData.LinAccAndGyroData) {
+        combinedSensorData.linAcc?.let { (x) ->
+            linAngle = x
         }
-    }
-    if (combinedSensorData is CombinedSensorData.GyroData){
-        combinedSensorData.gyro?.let {
-            gyroAngle = it.first
+        combinedSensorData.gyro?.let { (x) ->
+            gyroAngle = x
         }
     }
     Row {
