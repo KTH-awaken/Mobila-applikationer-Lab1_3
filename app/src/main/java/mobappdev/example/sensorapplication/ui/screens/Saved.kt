@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,8 +22,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mobappdev.example.sensorapplication.R
 import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.ui.theme.Styles
 import mobappdev.example.sensorapplication.ui.theme.Styles.blackText
@@ -45,7 +49,7 @@ fun Saved(
         ) {
             items(savedData.value.size) { index -> // Iterate over the index of savedData list
                 val session = savedData.value[index] // Get the session which is a List<Measurement>
-                SavedItem(session = session)
+                SavedItem(vm = vm,session = session)
             }
         }
 
@@ -54,6 +58,7 @@ fun Saved(
 
 @Composable
 fun SavedItem(
+    vm:DataVM,
     session: List<Measurement>
 ){
     val firstMesurment = session.first()
@@ -80,9 +85,18 @@ fun SavedItem(
                 style = MaterialTheme.typography.headlineLarge.copy(fontSize = 20.sp),
                 color = blackText,
             )
-
-
-
+            IconButton(
+                onClick = {
+                    vm.exportMeasurements(session)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.outline_file_download_24),
+                    contentDescription = "Download",
+                    tint = blackText,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
         }
     }
 }

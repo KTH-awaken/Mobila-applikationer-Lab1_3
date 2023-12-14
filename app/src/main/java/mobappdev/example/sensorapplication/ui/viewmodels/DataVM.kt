@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import mobappdev.example.sensorapplication.data.model.CSVHelper
 import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.domain.InternalSensorController
 import mobappdev.example.sensorapplication.domain.PolarController
@@ -188,6 +189,9 @@ class DataVM @Inject constructor(
             else -> {} // Do nothing
         }
         _state.update { it.copy(measuring = false) }
+    }
+    fun exportMeasurements(measurements:List<Measurement>){
+        internalSensorController.exportMeasurements(measurements = measurements)
     }
 }
 

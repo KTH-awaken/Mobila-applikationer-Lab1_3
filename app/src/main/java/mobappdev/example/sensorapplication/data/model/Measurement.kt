@@ -15,4 +15,4 @@ fun MutableStateFlow<List<Measurement>>.addMeasurement(linAcc: Triple<Float, Flo
                     it.toDouble(), Date()
                 )
             }) as List<Measurement>
-} //TODO ska göra så att man inte kan lägga till null värden
+}

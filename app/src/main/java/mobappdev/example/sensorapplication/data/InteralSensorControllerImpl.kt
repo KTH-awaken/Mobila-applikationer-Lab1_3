@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
+import mobappdev.example.sensorapplication.data.model.CSVHelper
 import mobappdev.example.sensorapplication.data.model.MathFilter
 import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.data.model.addMeasurement
@@ -37,7 +38,7 @@ import kotlin.math.sqrt
 private const val LOG_TAG = "Internal Sensor Controller"
 
 class InternalSensorControllerImpl(
-    context: Context,
+    private val context: Context,
     val measurementsRepo: MeasurementsRepo
 ): InternalSensorController, SensorEventListener {
 
@@ -81,6 +82,9 @@ class InternalSensorControllerImpl(
 
     private lateinit var mathFilter: MathFilter
 
+    override fun exportMeasurements(measurements: List<Measurement>) {
+        CSVHelper.exportToCSV(context,measurements)
+    }
 
     override fun startImuStream() {
         if (linAccSensor == null) {
@@ -156,9 +160,9 @@ class InternalSensorControllerImpl(
                     Log.d("COLLECTING","Size of listOfMeasurements: ${listOfMeasurements.size}")
                     Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
                 }
+
                 _currentMeasurements.addMeasurement(_currentLinAcc)
                 Log.d("MEASUREMENT", "Size=${_currentMeasurements.value.size}")
-                Log.d("MEASUREMENT", "Measurement=${_currentMeasurements.value.last()}")
 
                 _measurementsUI.update { listOfMeasurements }
                 _currentLinAccUI.update { _currentLinAcc }

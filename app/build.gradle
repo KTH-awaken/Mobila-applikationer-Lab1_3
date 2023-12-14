@@ -49,6 +49,9 @@ android {
 }
 
 dependencies {
+    //CSV
+    implementation 'org.apache.commons:commons-csv:1.5'
+
     //Data
     implementation "androidx.datastore:datastore-preferences:1.0.0-beta01" //uppdatera inte
 
