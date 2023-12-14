@@ -18,7 +18,7 @@ interface InternalSensorController {
     val streamingGyro: StateFlow<Boolean>
     val streamingLinAcc: StateFlow<Boolean>
 
-    val measurementsUI:StateFlow<List<Measurement>?>
+    val measurementsUI:StateFlow<List<List<Measurement>>>
 
 
     fun startImuStream()

@@ -61,8 +61,8 @@ class InternalSensorControllerImpl(
     override val streamingLinAcc: StateFlow<Boolean>
         get() = _streamingLinAcc.asStateFlow()
 
-    private val _measurementsUI = MutableStateFlow<List<Measurement>>(emptyList())
-    override val measurementsUI: StateFlow<List<Measurement>?>
+    private val _measurementsUI = MutableStateFlow<List<List<Measurement>>>(emptyList())
+    override val measurementsUI: StateFlow<List<List<Measurement>>>
         get() = _measurementsUI.asStateFlow()
 
     private var _currentMeasurements = MutableStateFlow<List<Measurement>>(emptyList())
@@ -97,9 +97,11 @@ class InternalSensorControllerImpl(
         // Start a coroutine to update the UI variable on a 2 Hz interval
         GlobalScope.launch(Dispatchers.Main) {
             _streamingLinAcc.value = true
+            var listOfMeasurements = emptyList<List<Measurement>>()
             while (_streamingLinAcc.value) {
                 // Update the UI variable
-                measurementsRepo.listOfMeasurementsFlow.collect { listOfMeasurements ->
+                measurementsRepo.listOfMeasurementsFlow.collect { newMeasurements  ->
+                    listOfMeasurements = newMeasurements
                     Log.d("COLLECTING","Size of listOfMeasurements: ${listOfMeasurements.size}")
                     Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
                 }
@@ -107,7 +109,7 @@ class InternalSensorControllerImpl(
                 Log.d("MEASUREMENT", "Size=${_currentMeasurements.value.size}")
                 Log.d("MEASUREMENT", "Measurement=${_currentMeasurements.value.last()}")
 
-                _measurementsUI.update { _currentMeasurements.value }
+                _measurementsUI.update { listOfMeasurements }
                 _currentLinAccUI.update { _currentLinAcc }
                 delay(500)
             }
@@ -201,10 +203,6 @@ class InternalSensorControllerImpl(
 
         return atan(safeCosTheta)
     }
-
-
-
-
 
     private fun filterEWMA(value:Double,prevValue:Double):Double{
         val a = 0.5

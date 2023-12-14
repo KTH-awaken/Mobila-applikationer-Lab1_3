@@ -23,7 +23,7 @@ sealed class Destinations(
     object Saved : Destinations(
         route = "saved",
         title = "Saved",
-        icon = Icons.Outlined.Search
+        icon = Icons.Outlined.Star
     )
 
     object Devices : Destinations(

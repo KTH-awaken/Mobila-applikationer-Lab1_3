@@ -1,16 +1,10 @@
 package mobappdev.example.sensorapplication.ui
 
-/**
- * File: MainActivity.kt
- * Purpose: Defines the main activity of the application.
- * Author: Jitse van Esch
- * Created: 2023-07-08
- * Last modified: 2023-09-21
- */
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -37,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.input.key.Key.Companion.Home
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -46,15 +41,20 @@ import mobappdev.example.sensorapplication.ui.screens.Home
 import mobappdev.example.sensorapplication.ui.screens.Saved
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), PermissionRequester {
     // Todo: Change for your own deviceID
-    private var deviceId = "B37EA42F"
+//    private var deviceId = "B37EA42F" //defult
+//    private var deviceId = "C07C8F22" //INTE ALEX sesor
+//    private var deviceId = "B5073A26" // ALEX sesor
+    private var deviceId = "C07BD021" // ALEX sesor
+    private lateinit var vm: DataVM
+
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        requestRequiredPermissions()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT), 31)
@@ -68,12 +68,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             SensorapplicationTheme {
                 val navController = rememberNavController()
-                val vm = hiltViewModel<DataVM>()
+                  vm = hiltViewModel<DataVM>()
                 hideSystemBars()
                 // Use hardcoded deviceID
                 vm.chooseSensor(deviceId)
+                vm.permissionRequester = this
 
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -93,6 +93,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun requestRequiredPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT), 31)
+            } else {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 30)
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 29)
+        }
+    }
 
     @Composable
     fun NavigationGraph(navController: NavHostController, vm: DataVM) {
@@ -105,11 +116,30 @@ class MainActivity : ComponentActivity() {
             }
             composable(Destinations.Devices.route) {
                     BluetoothDataScreen(vm = vm)
-//                Favorites(vm=vm)
             }
         }
     }
+    override fun triggerPermissionRequest(permissions: Array<String>, requestCode: Int) {
+        ActivityCompat.requestPermissions(this, permissions, requestCode)
+    }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == DataVM.REQUEST_FINE_LOCATION_PERMISSIONS) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                vm.startDeviceScan()
+            } else {
+                // Permission was denied, handle this case
+            }
+        }
+    }
+
+
+
 }
+
+
+
+
 
 fun ComponentActivity.hideSystemBars() {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -129,4 +159,7 @@ fun ComponentActivity.hideSystemBars() {
             it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
+}
+interface PermissionRequester {
+    fun triggerPermissionRequest(permissions: Array<String>, requestCode: Int)
 }
