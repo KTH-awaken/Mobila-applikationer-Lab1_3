@@ -47,6 +47,13 @@ fun ActionButtons(
             ) {
                 Text(text = "Start gyro", color = blackText)
             }
+            Button(
+                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
+                onClick = vm::startPolarGyro,
+//                    enabled = (state.measuring)
+            ) {
+                Text(text = "Start Polar Gyro", color = blackText)
+            }
         }
         Row(
             modifier = Modifier,
@@ -66,24 +73,12 @@ fun ActionButtons(
             ) {
                 Text(text = "Stop gyro", color = blackText)
             }
-        }
-        Row(
-            modifier = Modifier,
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-        ){
-            Button(
-                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
-                onClick = vm::startPolarGyro,
-//                    enabled = (state.measuring)
-            ) {
-                Text(text = "Start Polar Gyro", color = blackText)
-            }
             Button(
                 colors = ButtonDefaults.buttonColors(redAppleWatch),
-                onClick = {/*TODO*/}
+                onClick = vm::stopDataStream
 //                    enabled = (state.measuring)
             ) {
-                Text(text = "Do nothing", color = blackText)
+                Text(text = "Stop Polar Gyro", color = blackText)
             }
         }
     }

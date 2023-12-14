@@ -178,7 +178,7 @@ class AndroidPolarController (
                         it1
                     )
                 } }
-                Log.d("POLAR_GYRO","polar gyro=${_currentLinAccUI.value}")
+                Log.d("POLAR_ACC","polar acc=${_currentLinAccUI.value}")
                 _currentGyroUI.update { _currentLinAcc?.let { it1 ->
                     _currentGyro?.let { it2 ->
                         Log.d("CALCULATING_POLAR","Calculated Gyro=$it2")
@@ -188,6 +188,7 @@ class AndroidPolarController (
                     }
                 } }
                 Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")
+
                 delay(500)
             }
 
@@ -238,7 +239,13 @@ class AndroidPolarController (
     }
 
     override fun stopGyroStream() {
-        TODO("Not yet implemented")
+        if (_streamingLinAcc.value) {
+            GlobalScope.launch {
+
+            }
+            _streamingLinAcc.value = false
+            _streamingGyro.value = false
+        }
     }
 
     private fun requestStreamSettings(identifier: String, feature: PolarBleApi.PolarDeviceDataType): Flowable<PolarSensorSetting> {
