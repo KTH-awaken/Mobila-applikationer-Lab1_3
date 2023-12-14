@@ -19,16 +19,20 @@ import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.errors.PolarInvalidArgument
 import com.polar.sdk.api.model.PolarAccelerometerData
 import com.polar.sdk.api.model.PolarDeviceInfo
+import com.polar.sdk.api.model.PolarGyroData
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarSensorSetting
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import mobappdev.example.sensorapplication.data.model.MathFilter
 import mobappdev.example.sensorapplication.domain.PolarController
 import java.util.UUID
@@ -90,6 +94,9 @@ class AndroidPolarController (
     override val streamingLinAcc: StateFlow<Boolean>
         get() = _streamingLinAcc.asStateFlow()
 
+    private var _currentGyro: Triple<Float, Float, Float>? = null
+    private var _currentLinAcc: Triple<Float, Float, Float>? = null
+
     private lateinit var broadcastDisposable: Disposable
 
     private var lastLinAccSample: Triple<Float, Float, Float>? = null
@@ -147,8 +154,69 @@ class AndroidPolarController (
     }
 
     @SuppressLint("CheckResult")
-    override fun startGyroStream(deviceId:String) {
-        requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.GYRO)
+    override fun startGyroStream(deviceId:String) { //TODO add saving
+        var gyroData: Triple<Float,Float,Float>
+        if (_streamingGyro.value && _streamingLinAcc.value) {
+            Log.e(TAG, "Gyroscope and LinAcc sensor is already streaming")
+            return
+        }
+
+        mathFilter = MathFilter()
+        GlobalScope.launch {
+            _streamingGyro.value = true
+            _streamingLinAcc.value = true
+            fetchGyroStreamData(deviceId)
+            while (_streamingGyro.value && _streamingLinAcc.value) {
+                fetchAccStreamingData(deviceId)
+                fetchGyroStreamData(deviceId)
+                Log.d(TAG,"Fetched Acc Data=${_currentLinAcc}")
+                Log.d(TAG,"Fetched Gyro Data=${_currentGyro}")
+
+                _currentLinAccUI.update { _currentLinAcc?.let { it1 ->
+                    Log.d("CALCULATING_POLAR","Calculated Acc=$it1")
+                    mathFilter.calculateAngles(
+                        it1
+                    )
+                } }
+                Log.d("POLAR_GYRO","polar gyro=${_currentLinAccUI.value}")
+                _currentGyroUI.update { _currentLinAcc?.let { it1 ->
+                    _currentGyro?.let { it2 ->
+                        Log.d("CALCULATING_POLAR","Calculated Gyro=$it2")
+                        mathFilter.calculateAnglesWithGyro(
+                            it1, it2
+                        )
+                    }
+                } }
+                Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")
+                delay(500)
+            }
+
+        }
+    }
+    @SuppressLint("CheckResult")
+    private fun fetchGyroStreamData(deviceId:String){
+        requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.GYRO).flatMap {
+                settings: PolarSensorSetting ->
+            api.startGyroStreaming(deviceId, settings)
+        }.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { polarGyroData: PolarGyroData ->
+                    for (data in polarGyroData.samples) {
+                        _currentGyro = Triple(data.x,data.y,data.z)
+                        //Log.d(TAG, "Gyro    x: ${data.x} y: ${data.y} z: ${data.z} timeStamp: ${data.timeStamp}")
+                    }
+                },
+                { error: Throwable ->
+                    Log.e(TAG, "Gyro stream failed. Reason $error")
+                },
+                {
+                    Log.d(TAG, "Gyro stream complete")
+                }
+            )
+    }
+
+    @SuppressLint("CheckResult")
+    private fun fetchAccStreamingData(deviceId:String){
         requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.ACC).flatMap {
                 settings: PolarSensorSetting ->
             api.startAccStreaming(deviceId, settings)
@@ -156,7 +224,8 @@ class AndroidPolarController (
             .subscribe(
                 { polarAccelerometerData: PolarAccelerometerData ->
                     for (data in polarAccelerometerData.samples) {
-                        Log.d(TAG, "ACC    x: ${data.x} y: ${data.y} z: ${data.z} timeStamp: ${data.timeStamp}")
+                        _currentLinAcc = Triple(data.x.toFloat()/4096,data.y.toFloat()/4096,data.z.toFloat()/4096)
+                        //Log.d(TAG, "ACC    x: ${data.x} y: ${data.y} z: ${data.z} timeStamp: ${data.timeStamp}")
                     }
                 },
                 { error: Throwable ->
@@ -167,7 +236,6 @@ class AndroidPolarController (
                 }
             )
     }
-    //TODO use this PolarBleApi.PolarDeviceDataType.ACC
 
     override fun stopGyroStream() {
         TODO("Not yet implemented")
