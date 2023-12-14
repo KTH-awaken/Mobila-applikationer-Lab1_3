@@ -1,6 +1,5 @@
 package mobappdev.example.sensorapplication.ui.viewmodels
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -59,6 +58,12 @@ class DataVM @Inject constructor(
 //    private val _savedData = MutableStateFlow<List<Measurement>>(emptyList())
 //    val savedData: StateFlow<List<Measurement>> get() = _savedData
 
+    private var _premisionsGranted = MutableStateFlow(true)
+    val premisionsGranted: StateFlow<Boolean> get() = _premisionsGranted
+    fun setPremisionGranted(premisionsGranted:Boolean){
+        _premisionsGranted.value=premisionsGranted
+    }
+
     // Combine the two data flows
     val combinedDataFlow= combine(
         gyroDataFlow,
@@ -106,6 +111,7 @@ class DataVM @Inject constructor(
         Log.d("BLUETOOTH", "1")
         if (ContextCompat.checkSelfPermission(application, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             bluetoothAdapter?.startDiscovery()
+            startDiscovery()
         Log.d("BLUETOOTH", "2")
         } else {
         Log.d("BLUETOOTH", "-3")
@@ -114,41 +120,59 @@ class DataVM @Inject constructor(
     }
 
 
-    private fun startDiscovery() {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val action: String = intent.action!!
-                when(action) {
-                    BluetoothDevice.ACTION_FOUND -> {
-                        val device: BluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)!!
-                        if (isPolarDevice(device)) {
-                            _devices.value = _devices.value + device
-                        }
-                    }
-                    // Handle other actions like BluetoothAdapter.ACTION_DISCOVERY_FINISHED if needed
-                }
-            }
-        }
-
-        // Register for broadcasts when a device is discovered
-        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
-        //... register receiver with the filter
+    init {
+        startDiscovery()
     }
 
-    @SuppressLint("MissingPermission")//todo ta bort om inte går att to connecta
-    private fun isPolarDevice(device: BluetoothDevice): Boolean {
+    override fun onCleared() {
+        super.onCleared()
+        // Unregister the BroadcastReceiver
+        application.unregisterReceiver(receiver)
+    }
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            Log.d("BLUETOOTH", "3")
+            val action: String = intent.action!!
+            when(action) {
+                BluetoothDevice.ACTION_FOUND -> {
+            Log.d("BLUETOOTH", "4")
+                    val device: BluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)!!
+                    if (isPolarDevice(device,context)) {
+            Log.d("BLUETOOTH", "5")
+                        _devices.value = _devices.value + device
+                    }
+                }
+                // Handle other actions if needed
+            }
+        }
+    }
+
+    private fun startDiscovery() {
+        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        application.registerReceiver(receiver, filter)
+    }
+
+
+    private fun isPolarDevice(device: BluetoothDevice, context: Context): Boolean {
+        // Check if location permissions are granted
+        if (ContextCompat.checkSelfPermission(application, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("BLUETOOTH", "PREMISIONS GRANTED")
+            return device.name?.startsWith("Polar") == true
+
+        } else {
+            Log.d("BLUETOOTH", "PREMISIONS DENIDE")
+            permissionRequester?.triggerPermissionRequest(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_FINE_LOCATION_PERMISSIONS)
+        }
+        // Permission is granted, proceed with the Bluetooth device check
         return device.name?.startsWith("Polar") == true
     }
 
-    fun connectToDevice(device: BluetoothDevice) {
-        // Implement connection logic
-    }
 
-    fun disconnectFromDevice(device: BluetoothDevice) {
-        // Implement disconnection logic
-    }
+
 
     fun chooseSensor(deviceId: String) {
+        Log.d("BLUETOOTH", "CHOOSE SENSOR "+deviceId)
         _deviceId.update { deviceId }
     }
 
@@ -209,8 +233,8 @@ sealed class CombinedSensorData {
     data class GyroData(val gyro: Triple<Float, Float, Float>?) : CombinedSensorData()
     data class LinAccData(val linAcc: Triple<Float, Float, Float>?): CombinedSensorData()
     data class HrData(val hr: Int?) : CombinedSensorData()
-
     data class LinAccAndGyroData(val linAcc: Triple<Float, Float, Float>?,val gyro: Triple<Float, Float, Float>?)
+
 
 }
 

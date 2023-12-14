@@ -10,6 +10,7 @@ package mobappdev.example.sensorapplication.ui.screens
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mobappdev.example.sensorapplication.ui.Destinations
 import mobappdev.example.sensorapplication.ui.theme.Styles
+import mobappdev.example.sensorapplication.ui.theme.Styles.blackText
+import mobappdev.example.sensorapplication.ui.theme.Styles.yellowAppleWatch
 import mobappdev.example.sensorapplication.ui.viewmodels.CombinedSensorData
 import mobappdev.example.sensorapplication.ui.viewmodels.DataVM
 
@@ -52,134 +55,6 @@ fun BluetoothDataScreen(
     Devices(vm = vm)
     ScanButton(vm = vm)
 
-
-
-    /*
-    val state = vm.state.collectAsStateWithLifecycle().value
-    val deviceId = vm.deviceId.collectAsStateWithLifecycle().value
-
-    val value: String = when (val combinedSensorData = vm.combinedDataFlow.collectAsState().value) {
-        is CombinedSensorData.GyroData -> {
-            val triple = combinedSensorData.gyro
-            if (triple == null) {
-                "-"
-            } else {
-                String.format("%.1f, %.1f, %.1f", triple.first, triple.second, triple.third)
-            }
-
-        }
-        is CombinedSensorData.LinAccData -> {
-            val triple = combinedSensorData.linAcc
-            if (triple == null) {
-                "-"
-            } else {
-                String.format("%.1f, %.1f, %.1f", triple.first, triple.second, triple.third)
-            }
-        }
-        is CombinedSensorData.HrData -> combinedSensorData.hr.toString()
-        else -> "-"
-    }
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = CenterHorizontally
-    ) {
-        Text(text = if (state.connected) "connected" else "disconnected")
-        Box(
-            contentAlignment = Center,
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = if(state.measuring) value else "-",
-                fontSize = if (value.length < 3) 128.sp else 54.sp,
-                color = Color.Black,
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Button(
-                onClick = vm::connectToSensor,
-                enabled = !state.connected,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = Color.Gray
-                )
-            ) {
-                Text(text = "Connect\n${deviceId}")
-            }
-            Button(
-                onClick = vm::disconnectFromSensor,
-                enabled = state.connected,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = Color.Gray
-                )
-            ) {
-                Text(text = "Disconnect")
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Button(
-                onClick = vm::startHr,
-                enabled = (state.connected && !state.measuring),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = Color.Gray
-                )
-            ) {
-                Text(text = "Start\nHr Stream")
-            }
-            Button(
-                onClick = vm::startGyro,
-                enabled = (!state.measuring),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = Color.Gray
-                )
-            ) {
-                Text(text = "Start\nGyro Stream")
-            }
-            Button(
-                onClick = vm::startLinAcc,
-                enabled = (!state.measuring),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = Color.Gray
-                )
-            ) {
-                Text(text = "Start\nLinAcc Stream")
-            }
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Button(
-                onClick = vm::stopDataStream,
-                enabled = (state.measuring),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = Color.Gray
-                )
-            ) {
-                Text(text = "Stop\nstream")
-            }
-        }
-    }*/
 }
 
 @Composable
@@ -234,7 +109,7 @@ fun Devices(
     }
 }
 
-@SuppressLint("MissingPermission")
+//@SuppressLint("MissingPermission")
 @Composable
 fun Device(
     device: BluetoothDevice,
@@ -246,7 +121,7 @@ fun Device(
         modifier = Modifier
             .padding(10.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = CenterHorizontally,
     ) {
         ElevatedCard(
             colors = CardDefaults.cardColors(
@@ -256,35 +131,54 @@ fun Device(
             modifier = Modifier
                 .size(width = Styles.componentWidth, height = 140.dp)
                 .padding(top = 10.dp, bottom = 10.dp)
+
         ){
-
-            Text(
-                modifier = Modifier
-                    .padding(top = 20.dp,bottom = 20.dp),
-                text =  device.name ?: "Unknown",
-                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 20.sp),
-                color = Styles.blackText,
-            )
-
-            Button(
-                onClick = vm::connectToSensor,
-                enabled = !state.connected,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = Color.Gray
-                )
+            Column(
+                modifier = Modifier,
+                horizontalAlignment = CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Text(text = "Connect\n${device}")
-            }
-            Button(
-                onClick = vm::disconnectFromSensor,
-                enabled = state.connected,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = Color.Gray
-                )
-            ) {
-                Text(text = "Disconnect")
+                Row(
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(top = 20.dp,bottom = 20.dp),
+                        text =  device.name ?: "Unknown",
+                        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 16.sp),
+                        color = Styles.blackText,
+                    )
+                }
+                Row(
+                ) {
+
+                    Button(
+                        onClick = {
+                            val deviceId = device.name?.split(" ")?.lastOrNull() ?: "Unknown"
+                            vm.chooseSensor(deviceId)
+                            if (device.name != null) {
+                                Log.d("BLUETOOTH", " NAME : $deviceId")
+                            }
+                            vm.connectToSensor()
+                        },
+                        enabled = !state.connected,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = blackText,
+                            disabledContainerColor = Color.Gray
+                        )
+                    ) {
+                        Text(text = "Connect" , color = Color.White)
+                    }
+                    Button(
+                        onClick = vm::disconnectFromSensor,
+                        enabled = state.connected,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = blackText,
+                            disabledContainerColor = Color.Gray
+                        )
+                    ) {
+                        Text(text = "Disconnect",color = Color.White)
+                    }
+                }
             }
 
         }

@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity(), PermissionRequester {
 //    private var deviceId = "B37EA42F" //defult
 //    private var deviceId = "C07C8F22" //INTE ALEX sesor
 //    private var deviceId = "B5073A26" // ALEX sesor
-    private var deviceId = "C07BD021" // ALEX sesor
+    private var deviceId = "C07BD021" //vår sensor
     private lateinit var vm: DataVM
 
 
