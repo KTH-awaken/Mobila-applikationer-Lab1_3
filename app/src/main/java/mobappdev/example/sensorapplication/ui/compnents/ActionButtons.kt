@@ -52,7 +52,7 @@ fun ActionButtons(
                 onClick = vm::startPolarGyro,
 //                    enabled = (state.measuring)
             ) {
-                Text(text = "Start Polar Gyro", color = blackText)
+                Text(text = "Start PGyro", color = blackText)
             }
         }
         Row(
@@ -78,7 +78,7 @@ fun ActionButtons(
                 onClick = vm::stopDataStream
 //                    enabled = (state.measuring)
             ) {
-                Text(text = "Stop Polar Gyro", color = blackText)
+                Text(text = "Stop PGyro", color = blackText)
             }
         }
     }

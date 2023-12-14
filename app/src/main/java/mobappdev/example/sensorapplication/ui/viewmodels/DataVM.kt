@@ -216,7 +216,7 @@ class DataVM @Inject constructor(
 
         viewModelScope.launch {
             val maxTime = maximumMeasurementTime.value
-            delay(maxTime.toLong()) // 10 seconds in milliseconds
+            delay(maxTime.toLong())
 //            stopDataStream()
             internalSensorController.stopGyroStream()
             Log.d("BLUETOOTH", "STOPPED STREAMING TIMER DONE")
