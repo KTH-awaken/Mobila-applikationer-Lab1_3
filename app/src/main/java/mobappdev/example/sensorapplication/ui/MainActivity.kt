@@ -137,7 +137,7 @@ class MainActivity : ComponentActivity(), PermissionRequester {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Sensor Application is running")
             .setContentText("The application is measuring in the background")
-            .setSmallIcon(R.drawable.outline_file_download_24) // Replace with your icon
+            .setSmallIcon(R.drawable.baseline_notifications_active_24) // Replace with your icon
             .setContentIntent(pendingIntent)
             .build()
 
