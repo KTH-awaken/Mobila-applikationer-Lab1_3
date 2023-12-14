@@ -76,7 +76,7 @@ fun SavedItem(
             Text(
                 modifier = Modifier
                     .padding(top = 20.dp,bottom = 20.dp),
-                text =  firstMesurment.time.toString(),
+                text = if (firstMesurment.time != null) firstMesurment.time.toString() else "",
                 style = MaterialTheme.typography.headlineLarge.copy(fontSize = 20.sp),
                 color = blackText,
             )

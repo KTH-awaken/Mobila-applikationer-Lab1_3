@@ -175,7 +175,12 @@ class InternalSensorControllerImpl(
             // Unregister the listener to stop receiving gyroscope events (automatically stops the coroutine as well
             sensorManager.unregisterListener(this, gyroSensor)
             sensorManager.unregisterListener(this, linAccSensor)
+            GlobalScope.launch {
+                measurementsRepo.saveMeasurementsToList(_currentMeasurements.value)
+                _currentMeasurements.value = emptyList()
+            }
             _streamingGyro.value = false
+            _streamingLinAcc.value = false
         }
     }
 
