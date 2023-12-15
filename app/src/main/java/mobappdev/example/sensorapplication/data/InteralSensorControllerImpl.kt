@@ -21,7 +21,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
@@ -29,12 +28,8 @@ import mobappdev.example.sensorapplication.data.model.CSVHelper
 import mobappdev.example.sensorapplication.data.model.MathFilter
 import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.data.model.addMeasurement
+import mobappdev.example.sensorapplication.data.model.addMeasurementToList
 import mobappdev.example.sensorapplication.domain.InternalSensorController
-import java.util.Collections.addAll
-import java.util.Date
-import kotlin.math.atan
-import kotlin.math.atan2
-import kotlin.math.sqrt
 
 private const val LOG_TAG = "Internal Sensor Controller"
 
@@ -113,10 +108,10 @@ class InternalSensorControllerImpl(
                     Log.d("COLLECTING","Size of listOfMeasurements: ${listOfMeasurements.size}")
                     Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
                 }
-                _currentMeasurements.addMeasurement(_currentLinAcc)
+                _currentMeasurements.addMeasurement(_currentLinAcc,"LinAcc","Internal")
                 Log.d("MEASUREMENT", "Size=${_currentMeasurements.value.size}")
                 Log.d("MEASUREMENT", "Measurement=${_currentMeasurements.value.last()}")
-
+                listOfMeasurements.addMeasurementToList(_currentMeasurements.value)
                 _measurementsUI.update { listOfMeasurements }
                 _currentLinAccUI.update { _currentLinAcc }
                 delay(500)
@@ -163,7 +158,8 @@ class InternalSensorControllerImpl(
                     Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
                 }
 
-                _currentMeasurements.addMeasurement(_currentLinAcc)
+                _currentMeasurements.addMeasurement(_currentLinAcc,"LinAcc","Internal")
+                _currentMeasurements.addMeasurement(_currentGyro,"Gyro","Internal")
                 Log.d("MEASUREMENT", "Size=${_currentMeasurements.value.size}")
 
                 _measurementsUI.update { listOfMeasurements }

@@ -33,12 +33,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
 import mobappdev.example.sensorapplication.data.model.MathFilter
+import mobappdev.example.sensorapplication.data.model.Measurement
+import mobappdev.example.sensorapplication.data.model.addMeasurement
+import mobappdev.example.sensorapplication.data.model.addMeasurementToList
 import mobappdev.example.sensorapplication.domain.PolarController
 import java.util.UUID
 
 class AndroidPolarController (
     private val context: Context,
+    val measurementsRepo: MeasurementsRepo
 ): PolarController {
 
     private val api: PolarBleApi by lazy {
@@ -97,12 +102,21 @@ class AndroidPolarController (
     private var _currentGyro: Triple<Float, Float, Float>? = null
     private var _currentLinAcc: Triple<Float, Float, Float>? = null
 
+
+    private val _measurementsUI = MutableStateFlow<List<List<Measurement>>>(emptyList())
+    override val measurementsUI: StateFlow<List<List<Measurement>>>
+        get() = _measurementsUI.asStateFlow()
+
+    private var _currentMeasurements = MutableStateFlow<List<Measurement>>(emptyList())
+
     private lateinit var broadcastDisposable: Disposable
 
     private var lastLinAccSample: Triple<Float, Float, Float>? = null
     private var lastGyroSample: Triple<Float, Float, Float>? = null
 
     private lateinit var mathFilter: MathFilter
+
+
 
     init {
         api.setPolarFilter(false)
@@ -166,7 +180,9 @@ class AndroidPolarController (
             _streamingGyro.value = true
             _streamingLinAcc.value = true
             fetchGyroStreamData(deviceId)
+            var listOfMeasurements = emptyList<List<Measurement>>()
             while (_streamingGyro.value && _streamingLinAcc.value) {
+
                 fetchAccStreamingData(deviceId)
                 fetchGyroStreamData(deviceId)
                 Log.d(TAG,"Fetched Acc Data=${_currentLinAcc}")
@@ -188,6 +204,17 @@ class AndroidPolarController (
                     }
                 } }
                 Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")//TODO HÄR HAR VI VÄRDET
+
+                measurementsRepo.listOfMeasurementsFlow.collect { newMeasurements  ->
+                    listOfMeasurements = newMeasurements
+                    Log.d("COLLECTING","Size of listOfMeasurements: ${listOfMeasurements.size}")
+                    Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
+                }
+                _currentMeasurements.addMeasurement(_currentLinAcc,"LinAcc","Polar")
+                _currentMeasurements.addMeasurement(_currentGyro,"Gyro","Polar")
+                listOfMeasurements.addMeasurementToList(_currentMeasurements.value)
+                _measurementsUI.update { listOfMeasurements }
+                Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")
 
                 delay(500)
             }
@@ -241,7 +268,8 @@ class AndroidPolarController (
     override fun stopGyroStream() {
         if (_streamingLinAcc.value) {
             GlobalScope.launch {
-
+                measurementsRepo.saveMeasurementsToList(_currentMeasurements.value)
+                _currentMeasurements.value = emptyList()
             }
             _streamingLinAcc.value = false
             _streamingGyro.value = false

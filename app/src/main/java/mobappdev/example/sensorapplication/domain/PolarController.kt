@@ -10,6 +10,7 @@ package mobappdev.example.sensorapplication.domain
 
 
 import kotlinx.coroutines.flow.StateFlow
+import mobappdev.example.sensorapplication.data.model.Measurement
 
 interface PolarController {
     val currentHR: StateFlow<Int?>
@@ -22,6 +23,8 @@ interface PolarController {
     val currentGyroUI: StateFlow<Triple<Float, Float, Float>?>
     val streamingGyro: StateFlow<Boolean>
     val streamingLinAcc: StateFlow<Boolean>
+
+    val measurementsUI:StateFlow<List<List<Measurement>>>
 
     fun connectToDevice(deviceId: String)
     fun disconnectFromDevice(deviceId: String)

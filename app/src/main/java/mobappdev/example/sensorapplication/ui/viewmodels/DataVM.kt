@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -38,13 +39,14 @@ class DataVM @Inject constructor(
 
     private val gyroDataFlow = internalSensorController.currentGyroUI
     private val linAccDataFlow = internalSensorController.currentLinAccUI
-    private val _savedData = internalSensorController.measurementsUI
+    val savedInternalData = internalSensorController.measurementsUI
 
     val polarGyroDataFlow = polarController.currentGyroUI
-     val polarAccDataFlow = polarController.currentLinAccUI
+    val polarAccDataFlow = polarController.currentLinAccUI
+    val savedPolarData = polarController.measurementsUI
 
     private val hrDataFlow = polarController.currentHR
-    val savedData: StateFlow<List<List<Measurement>>> get() = _savedData
+
 
     private var _sensorMode = MutableStateFlow<String>("ACC")
     val sensorMode: StateFlow<String> get() = _sensorMode
@@ -69,7 +71,10 @@ class DataVM @Inject constructor(
 
     private var _premisionsGranted = MutableStateFlow(true)
 
-    private var _isPolarStreaming = MutableStateFlow(false)
+
+    private val _isPolarStreaming = MutableStateFlow(false)
+    val isPolarStreaming: StateFlow<Boolean>
+        get() = _isPolarStreaming.asStateFlow()
     val premisionsGranted: StateFlow<Boolean> get() = _premisionsGranted
     fun setPremisionGranted(premisionsGranted:Boolean){
         _premisionsGranted.value=premisionsGranted

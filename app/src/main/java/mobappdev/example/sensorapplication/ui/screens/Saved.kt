@@ -36,7 +36,12 @@ import mobappdev.example.sensorapplication.ui.viewmodels.DataVM
 fun Saved(
     vm: DataVM
 ){
-    val savedData = vm.savedData.collectAsState()
+    val isPolarStream = vm.isPolarStreaming.collectAsState()
+    val savedData = if(isPolarStream.value){
+        vm.savedPolarData.collectAsState()
+    }else{
+        vm.savedInternalData.collectAsState()
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,7 +66,7 @@ fun SavedItem(
     vm:DataVM,
     session: List<Measurement>
 ){
-    val firstMesurment = session.first()
+    val firstMesurment = session.firstOrNull()
     Column(
         modifier = Modifier
             .padding(10.dp),
@@ -81,7 +86,11 @@ fun SavedItem(
             Text(
                 modifier = Modifier
                     .padding(top = 20.dp,bottom = 20.dp),
-                text = if (firstMesurment.time != null) firstMesurment.time.toString() else "",
+                text  = if (firstMesurment != null) {
+                    firstMesurment.time.toString()
+                } else {
+                    ""
+                },
                 style = MaterialTheme.typography.headlineLarge.copy(fontSize = 20.sp),
                 color = blackText,
             )

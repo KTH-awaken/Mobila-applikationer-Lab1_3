@@ -30,8 +30,8 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun providePolarController(@ApplicationContext context: Context): PolarController {
-        return AndroidPolarController(context)
+    fun providePolarController(@ApplicationContext context: Context,measurementsRepo:MeasurementsRepo): PolarController {
+        return AndroidPolarController(context,measurementsRepo)
     }
 
     @Provides
