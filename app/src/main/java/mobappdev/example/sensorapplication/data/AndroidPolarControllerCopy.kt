@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import mobappdev.example.sensorapplication.data.model.Measurement
 import mobappdev.example.sensorapplication.domain.PolarController
 import java.util.UUID
 
@@ -72,6 +73,8 @@ class AndroidPolarControllerCopy (
     override val streamingGyro: StateFlow<Boolean>
         get() = TODO("Not yet implemented")
     override val streamingLinAcc: StateFlow<Boolean>
+        get() = TODO("Not yet implemented")
+    override val measurementsUI: StateFlow<List<List<Measurement>>>
         get() = TODO("Not yet implemented")
 
     init {

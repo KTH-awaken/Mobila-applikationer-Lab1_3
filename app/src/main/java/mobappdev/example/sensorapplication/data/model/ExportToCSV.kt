@@ -24,9 +24,9 @@ object CSVHelper{
 
         try {
             FileWriter(filePath).use { fileWriter ->
-                fileWriter.append("Angle, Time\n") // Adding header
+                fileWriter.append("Angle : Time : Sensor Type : Device Type \n") // Adding header
                 for (measurement in listOfMeasurements) {
-                    fileWriter.append("${measurement.angle},${measurement.time}\n")
+                    fileWriter.append("${measurement.angle},${measurement.time},${measurement.sensorType},${measurement.deviceType}\n")
                 }
             }
             Log.d("EXPORT", "CSV file exported successfully to: ${filePath.absolutePath}")
