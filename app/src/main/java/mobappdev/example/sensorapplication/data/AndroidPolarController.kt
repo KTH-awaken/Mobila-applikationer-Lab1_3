@@ -98,8 +98,8 @@ class AndroidPolarController (
     override val streamingLinAcc: StateFlow<Boolean>
         get() = _streamingLinAcc.asStateFlow()
 
-    private lateinit var _currentGyro: Triple<Float, Float, Float>
-    private lateinit var _currentLinAcc: Triple<Float, Float, Float>
+    private var _currentGyro = Triple(0f,0f,0f)
+    private var _currentLinAcc = Triple(0f,0f,0f)
 
 
     private val _measurementsUI = MutableStateFlow<List<List<Measurement>>>(emptyList())
@@ -196,19 +196,13 @@ class AndroidPolarController (
 
                 fetchAccStreamingData(deviceId)
                 fetchGyroStreamData(deviceId)
-                Log.d(TAG,"Fetched Acc Data=${_currentLinAcc}")
-                Log.d(TAG,"Fetched Gyro Data=${_currentGyro}")
 
-                _currentLinAccUI.update { _currentLinAcc?.let { it1 ->
-                    Log.d("CALCULATING_POLAR","Calculated Acc=$it1")
-                    mathFilter.calculateAngles(
-                        it1
-                    )
-                } }
+
                 Log.d("POLAR_ACC","polar acc=${_currentLinAccUI.value}")
                 _currentGyro = mathFilter.calculateAnglesWithGyro(_currentLinAcc,_currentGyro)
                 _currentLinAcc = mathFilter.calculateAngles(_currentLinAcc)
                 _currentGyroUI.update { _currentGyro }
+                _currentLinAccUI.update { _currentLinAcc }
 
                 Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")//TODO HÄR HAR VI VÄRDET
 
