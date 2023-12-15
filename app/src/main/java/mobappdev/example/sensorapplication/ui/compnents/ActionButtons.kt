@@ -9,6 +9,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +26,49 @@ fun ActionButtons(
     Column(
         Modifier
             .padding(bottom = 35.dp)
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Bottom,
+    ) {
+        if(vm.sensorType.collectAsState().value == "POLAR"){
+            if(!state.measuring){
+                Button(
+                    colors = ButtonDefaults.buttonColors(yellowAppleWatch),
+                    onClick = vm::startPolarGyro,
+                ) {
+                    Text(text = "Start Polar", color = blackText)
+                }
+            }else{
+                Button(
+                    colors = ButtonDefaults.buttonColors(redAppleWatch),
+                    onClick = vm::stopDataStream
+                ) {
+                    Text(text = "Stop Polar", color = blackText)
+                }
+            }
+        }else{
+            if(!state.measuring){
+                Button(
+                    colors = ButtonDefaults.buttonColors(yellowAppleWatch),
+                    onClick = vm::startGyro,
+                ) {
+                    Text(text = "Start Internal", color = blackText)
+                }
+            }else{
+                Button(
+                    colors = ButtonDefaults.buttonColors(redAppleWatch),
+                    onClick = vm::stopDataStream,
+                ) {
+                    Text(text = "Stop Internal", color = blackText)
+                }
+            }
+        }
+
+
+    }
+
+    Column(
+        Modifier
+            .padding(bottom = 35.dp)
             .fillMaxHeight()
         ,
         verticalArrangement = Arrangement.Bottom,
@@ -33,53 +77,29 @@ fun ActionButtons(
             modifier = Modifier,
             horizontalArrangement = Arrangement.spacedBy(5.dp),
         ){
-                Button(
+                /*Button(
                     colors = ButtonDefaults.buttonColors(yellowAppleWatch),
                     onClick ={} //todo vm::startLinAcc,
 //                    enabled = (!state.measuring)
                 ) {
                     Text(text = "Start Acc", color = blackText)
-                }
-            Button(
-                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
-                onClick = vm::startGyro,
-//                    enabled = (!state.measuring)
-            ) {
-                Text(text = "Start gyro", color = blackText)
-            }
-            Button(
-                colors = ButtonDefaults.buttonColors(yellowAppleWatch),
-                onClick = vm::startPolarGyro,
-//                    enabled = (state.measuring)
-            ) {
-                Text(text = "Start PGyro", color = blackText)
-            }
+                }*/
+
+
         }
         Row(
             modifier = Modifier,
             horizontalArrangement = Arrangement.spacedBy(5.dp),
         ){
-            Button(
+            /*Button(
                 colors = ButtonDefaults.buttonColors(redAppleWatch),
                 onClick = vm::stopDataStream,
 //                    enabled = (state.measuring)
             ) {
                 Text(text = "Stop Acc", color = blackText)
-            }
-            Button(
-                colors = ButtonDefaults.buttonColors(redAppleWatch),
-                onClick = vm::stopDataStream,
-//                    enabled = (state.measuring)
-            ) {
-                Text(text = "Stop gyro", color = blackText)
-            }
-            Button(
-                colors = ButtonDefaults.buttonColors(redAppleWatch),
-                onClick = vm::stopDataStream
-//                    enabled = (state.measuring)
-            ) {
-                Text(text = "Stop PGyro", color = blackText)
-            }
+            }*/
+
+
         }
     }
 }

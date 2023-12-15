@@ -31,6 +31,8 @@ import mobappdev.example.sensorapplication.ui.theme.Styles
 import mobappdev.example.sensorapplication.ui.theme.Styles.blackText
 import mobappdev.example.sensorapplication.ui.theme.Styles.yellowAppleWatch
 import mobappdev.example.sensorapplication.ui.viewmodels.DataVM
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun Saved(
@@ -45,14 +47,13 @@ fun Saved(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         LazyColumn(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(1.dp)
         ) {
             items(savedData.value.size) { index ->
                 val session = savedData.value[index]
                 SavedItem(vm = vm,session = session)
             }
         }
-
     }
 }
 
@@ -64,38 +65,55 @@ fun SavedItem(
     val firstMesurment = session.first()
     Column(
         modifier = Modifier
-            .padding(10.dp),
+            .padding(1.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ElevatedCard(
             colors = CardDefaults.cardColors(
-                containerColor = yellowAppleWatch,
+                containerColor = Color(32, 33, 36),
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             modifier = Modifier
-                .size(width = Styles.componentWidth, height = 140.dp)
-                .padding(top = 10.dp, bottom = 10.dp)
+                .size(width = Styles.componentWidth, height = 80.dp)
+                .padding(5.dp)
+
+
         ){
 
-            Text(
+            Row(
                 modifier = Modifier
-                    .padding(top = 20.dp,bottom = 20.dp),
-                text = if (firstMesurment.time != null) firstMesurment.time.toString() else "",
-                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 20.sp),
-                color = blackText,
-            )
-            IconButton(
-                onClick = {
-                    vm.exportMeasurements(session)
+                    .fillMaxWidth()
+                    .padding(5.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+
+            ){
+                val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss", Locale.getDefault())
+                val formattedTime = if (firstMesurment.time != null) {
+                    dateFormat.format(firstMesurment.time)
+                } else {
+                    ""
                 }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.outline_file_download_24),
-                    contentDescription = "Download",
-                    tint = blackText,
-                    modifier = Modifier.size(36.dp)
+                Text(
+                    modifier = Modifier.padding(top = 17.dp),
+                    text = formattedTime,
+                    style = MaterialTheme.typography.headlineSmall.copy(fontSize = 16.sp),
+                    color = yellowAppleWatch,
                 )
+                IconButton(
+                    modifier = Modifier.padding(top = 5.dp),
+
+                    onClick = {
+                        vm.exportMeasurements(session)
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.outline_file_download_24),
+                        contentDescription = "Download",
+                        tint = yellowAppleWatch,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }
