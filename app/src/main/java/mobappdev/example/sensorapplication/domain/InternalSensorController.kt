@@ -8,9 +8,7 @@ package mobappdev.example.sensorapplication.domain
  * Last modified: 2023-09-21
  */
 
-import android.content.Context
 import kotlinx.coroutines.flow.StateFlow
-import mobappdev.example.sensorapplication.data.Repository.MeasurementsRepo
 import mobappdev.example.sensorapplication.data.model.Measurement
 
 interface InternalSensorController {
@@ -22,6 +20,8 @@ interface InternalSensorController {
     val measurementsUI:StateFlow<List<List<Measurement>>>
 
     fun exportMeasurements(measurements:List<Measurement>)
+
+    fun updateUIMeasurements()
     fun startImuStream()
     fun stopImuStream()
 

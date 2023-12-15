@@ -39,11 +39,10 @@ class DataVM @Inject constructor(
 
     private val gyroDataFlow = internalSensorController.currentGyroUI
     private val linAccDataFlow = internalSensorController.currentLinAccUI
-    val savedInternalData = internalSensorController.measurementsUI
+    val savedData = internalSensorController.measurementsUI
 
     val polarGyroDataFlow = polarController.currentGyroUI
     val polarAccDataFlow = polarController.currentLinAccUI
-    val savedPolarData = polarController.measurementsUI
 
     private val hrDataFlow = polarController.currentHR
 
@@ -78,6 +77,11 @@ class DataVM @Inject constructor(
     val premisionsGranted: StateFlow<Boolean> get() = _premisionsGranted
     fun setPremisionGranted(premisionsGranted:Boolean){
         _premisionsGranted.value=premisionsGranted
+    }
+
+    fun updateUIMeasurements(){
+        polarController.updateUIMeasurements()
+        internalSensorController.updateUIMeasurements()
     }
 
     // Combine the two data flows

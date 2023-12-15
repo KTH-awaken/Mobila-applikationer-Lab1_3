@@ -26,6 +26,7 @@ interface PolarController {
 
     val measurementsUI:StateFlow<List<List<Measurement>>>
 
+    fun updateUIMeasurements()
     fun connectToDevice(deviceId: String)
     fun disconnectFromDevice(deviceId: String)
 

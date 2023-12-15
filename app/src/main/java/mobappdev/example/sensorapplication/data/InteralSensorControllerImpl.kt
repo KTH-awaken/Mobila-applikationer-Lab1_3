@@ -82,6 +82,18 @@ class InternalSensorControllerImpl(
         CSVHelper.exportToCSV(context,measurements)
     }
 
+    override fun updateUIMeasurements() {
+        GlobalScope.launch {
+            var listOfListOfMeasurement = emptyList<List<Measurement>>()
+            measurementsRepo.listOfMeasurementsFlow.collect { newMeasurements  ->
+                listOfListOfMeasurement = newMeasurements
+                Log.d("COLLECTING","Size of listOfMeasurements: ${listOfListOfMeasurement.size}")
+                Log.d("COLLECTING","listOfMeasurements: $listOfListOfMeasurement")
+            }
+            _measurementsUI.update { listOfListOfMeasurement }
+        }
+    }
+
     //TODO: remove
     override fun startImuStream() {
         if (linAccSensor == null) {
@@ -162,7 +174,7 @@ class InternalSensorControllerImpl(
                 _currentMeasurements.addMeasurement(_currentGyro,"Gyro","Internal")
                 Log.d("MEASUREMENT", "Size=${_currentMeasurements.value.size}")
 
-                _measurementsUI.update { listOfMeasurements }
+                //_measurementsUI.update { listOfMeasurements }
                 _currentLinAccUI.update { _currentLinAcc }
                 _currentGyroUI.update { _currentGyro }
 

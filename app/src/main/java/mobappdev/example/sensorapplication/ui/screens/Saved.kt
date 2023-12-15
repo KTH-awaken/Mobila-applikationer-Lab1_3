@@ -37,11 +37,8 @@ fun Saved(
     vm: DataVM
 ){
     val isPolarStream = vm.isPolarStreaming.collectAsState()
-    val savedData = if(isPolarStream.value){
-        vm.savedPolarData.collectAsState()
-    }else{
-        vm.savedInternalData.collectAsState()
-    }
+    vm.updateUIMeasurements()
+    val savedData = vm.savedData.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()

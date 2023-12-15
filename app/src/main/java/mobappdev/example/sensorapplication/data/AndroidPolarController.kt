@@ -10,7 +10,6 @@ package mobappdev.example.sensorapplication.data
  */
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
 import com.polar.sdk.api.PolarBleApi
@@ -107,6 +106,19 @@ class AndroidPolarController (
     override val measurementsUI: StateFlow<List<List<Measurement>>>
         get() = _measurementsUI.asStateFlow()
 
+    override fun updateUIMeasurements() {
+        GlobalScope.launch {
+            var listOfListOfMeasurement = emptyList<List<Measurement>>()
+            measurementsRepo.listOfMeasurementsFlow.collect { newMeasurements  ->
+                listOfListOfMeasurement = newMeasurements
+                Log.d("COLLECTING_POLAR","Size of listOfMeasurements: ${listOfListOfMeasurement.size}")
+                Log.d("COLLECTING_POLAR","listOfMeasurements: $listOfListOfMeasurement")
+            }
+
+            _measurementsUI.update { listOfListOfMeasurement }
+        }
+    }
+
     private var _currentMeasurements = MutableStateFlow<List<Measurement>>(emptyList())
 
     private lateinit var broadcastDisposable: Disposable
@@ -179,7 +191,6 @@ class AndroidPolarController (
         GlobalScope.launch {
             _streamingGyro.value = true
             _streamingLinAcc.value = true
-            fetchGyroStreamData(deviceId)
             var listOfMeasurements = emptyList<List<Measurement>>()
             while (_streamingGyro.value && _streamingLinAcc.value) {
 
@@ -205,22 +216,17 @@ class AndroidPolarController (
                 } }
                 Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")//TODO HÄR HAR VI VÄRDET
 
-                measurementsRepo.listOfMeasurementsFlow.collect { newMeasurements  ->
-                    listOfMeasurements = newMeasurements
-                    Log.d("COLLECTING","Size of listOfMeasurements: ${listOfMeasurements.size}")
-                    Log.d("COLLECTING","listOfMeasurements: $listOfMeasurements")
-                }
                 _currentMeasurements.addMeasurement(_currentLinAcc,"LinAcc","Polar")
                 _currentMeasurements.addMeasurement(_currentGyro,"Gyro","Polar")
-                listOfMeasurements.addMeasurementToList(_currentMeasurements.value)
-                _measurementsUI.update { listOfMeasurements }
                 Log.d("POLAR_GYRO","polar gyro=${_currentGyroUI.value}")
-
+                //_measurementsUI.update { listOfMeasurements }
                 delay(500)
             }
 
         }
     }
+
+
     @SuppressLint("CheckResult")
     private fun fetchGyroStreamData(deviceId:String){
         requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.GYRO).flatMap {
@@ -269,6 +275,7 @@ class AndroidPolarController (
         if (_streamingLinAcc.value) {
             GlobalScope.launch {
                 measurementsRepo.saveMeasurementsToList(_currentMeasurements.value)
+                Log.d("POLAR_SAVING","Saving polar measurements=${_currentMeasurements.value}") //TODO är alltid null
                 _currentMeasurements.value = emptyList()
             }
             _streamingLinAcc.value = false
