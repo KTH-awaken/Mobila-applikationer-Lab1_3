@@ -50,48 +50,20 @@ fun Angle(
         }
     }
     Column {
-
-        Row {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(top = 20.dp,bottom = 20.dp, start = 5.dp, end = 5.dp),
-                    text = " ${linAngle.toInt()}°",
-                    style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
-                    color = yellowAppleWatch,
-                )
-                Text(text = "Acc", color =yellowAppleWatch)
-            }
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(top = 20.dp,bottom = 20.dp, start = 5.dp, end = 5.dp),
-                    text = " ${gyroAngle.toInt()}°",
-                    style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
-                    color = yellowAppleWatch,
-                )
-                Text(text = "Gyro", color =yellowAppleWatch)
-            }
-        }
-        Row {
+        if (vm.sensorType.collectAsState().value == "POLAR") {
+            Row {
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         modifier = Modifier
-                            .padding(top = 20.dp,bottom = 20.dp, start = 5.dp, end = 5.dp),
+                            .padding(top = 20.dp, bottom = 20.dp, start = 5.dp, end = 5.dp),
                         text = " ${polarLinAngle.toInt()}°",
                         style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
                         color = yellowAppleWatch,
                     )
-                    Text(text = "P Acc", color =yellowAppleWatch)
+                    Text(text = "P Acc", color = yellowAppleWatch)
                 }
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -99,17 +71,44 @@ fun Angle(
                 ) {
                     Text(
                         modifier = Modifier
-                            .padding(top = 20.dp,bottom = 20.dp, start = 5.dp, end = 5.dp),
+                            .padding(top = 20.dp, bottom = 20.dp, start = 5.dp, end = 5.dp),
                         text = " ${polarGyroAngle.toInt()}°",
                         style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
                         color = yellowAppleWatch,
                     )
-                    Text(text = "P Gyro", color =yellowAppleWatch)
+                    Text(text = "P Gyro", color = yellowAppleWatch)
                 }
-
+            }
+        }else{
+            Row {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 20.dp, start = 5.dp, end = 5.dp),
+                        text = " ${linAngle.toInt()}°",
+                        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
+                        color = yellowAppleWatch,
+                    )
+                    Text(text = "Acc", color = yellowAppleWatch)
+                }
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 20.dp, start = 5.dp, end = 5.dp),
+                        text = " ${gyroAngle.toInt()}°",
+                        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
+                        color = yellowAppleWatch,
+                    )
+                    Text(text = "Gyro", color = yellowAppleWatch)
+                }
+            }
         }
     }
-
-
 }
 
